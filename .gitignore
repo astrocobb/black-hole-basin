@@ -22,7 +22,11 @@ yarn-error.log*
 
 # OS Files
 .DS_Store
-Thumbs.db
+pgdata/
+pipeline/data/
+__pycache__/
+*.pyc
+.venv/
 
 # IDEs
 .vscode/
