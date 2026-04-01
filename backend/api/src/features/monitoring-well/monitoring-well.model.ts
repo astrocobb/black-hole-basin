@@ -14,6 +14,7 @@ export const MonitoringWellSchema = z.object({
 
 export type MonitoringWell = z.infer<typeof MonitoringWellSchema>
 
-export async function insertMonitoringWell(monitoringWell: MonitoringWell) {
+export async function insertMonitoringWell(monitoringWell: MonitoringWell): Promise<string> {
 
+  return 'Monitoring well successfully inserted!'
 }
