@@ -1,13 +1,13 @@
 import { serverErrorResponse, zodErrorResponse } from '../../utils/response.utils'
 import { type Response } from 'express'
-import { insertMonitoringWell, type MonitoringWell, MonitoringWellSchema } from './monitoring-well.model'
+import { insertMonitoringWell, type MonitoringWell, MonitoringWellModel } from './monitoring-well.model'
 
 
 export async function postMonitoringWell(request: Request, response: Response): Promise<void> {
 
   try {
 
-    const validationResult = MonitoringWellSchema.safeParse(request.body)
+    const validationResult = MonitoringWellModel.safeParse(request.body)
     if (!validationResult.success) {
       zodErrorResponse(response, validationResult.error)
       return

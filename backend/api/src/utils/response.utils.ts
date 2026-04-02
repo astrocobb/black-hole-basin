@@ -21,7 +21,6 @@ export function createStatus(status: number, data: unknown, message: string | nu
 export function zodErrorResponse(response: Response, error: ZodError) {
 
   let message = 'validation error occurred'
-
   if (error.issues[0]) {
     message = error.issues[0].message
   }
@@ -51,7 +50,6 @@ export function errorResponse(response: Response, status: Status): Response<Stat
  * @param defaultValue default value to send back to the client to help with rendering when an error occurs
  */
 export function serverErrorResponse(response: Response, defaultValue: unknown = null): Response<Status> {
-
   return errorResponse(
     response,
     createStatus(
