@@ -68,6 +68,6 @@ export class App {
   // starts the server and tells the terminal to post a message that the server is running and on what port
   public listen(): void  {
     this.app.listen(4200)
-    console.log('Express application built successfully')
+    console.log('Express application built successfully!')
   }
 }

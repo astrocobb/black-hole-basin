@@ -1,6 +1,7 @@
 import { App } from './App'
 import { type RedisClientType, createClient } from 'redis'
-import type { User } from './api/src/features/users/user.model'
+import type { User } from './features/users/user.model'
+import 'dotenv/config'
 
 
 declare module 'express-session' {

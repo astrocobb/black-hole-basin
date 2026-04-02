@@ -1,14 +1,13 @@
 import type { Request, Response } from 'express'
 import type { Status } from '../../utils/interfaces/Status'
-import Mailgun from 'mailgun.js'
-import formData from 'form-data'
+import { Resend } from 'resend'
 import { serverErrorResponse, zodErrorResponse } from '../../utils/response.utils'
 import { SignUpUserSchema } from './sign-up.model'
 import { setActivationToken, setHash } from '../../utils/auth.utils'
 import { type User, insertUser } from '../users/user.model'
 
 
-export async function signUpController (request: Request, response: Response) {
+export async function signUpController(request: Request, response: Response) {
   try {
 
     const validationResult = SignUpUserSchema.safeParse(request.body)
@@ -33,23 +32,21 @@ export async function signUpController (request: Request, response: Response) {
 
     let emailSent = false
     try {
-      const mailGun: Mailgun = new Mailgun(formData)
-      const mailgunClient = mailGun.client({ username: 'api', key: process.env.MAILGUN_API_KEY as string })
-      const basePath: string = `${request.protocol}://${request.hostname}:8080${request.originalUrl}/activation/${activationToken}`
-      const message = `
+      const resend = new Resend(process.env.RESEND_API_KEY as string)
+      const basePath: string = `${ request.protocol }://${ request.hostname }:8080${ request.originalUrl }/activation/${ activationToken }`
+      const html = `
         <h2>Welcome to Black Hole Basin!</h2>
         <p>You must confirm your account.</p>
-        <p><a href="${basePath}">${basePath}</a></p>`
-      const mailgunMessage = {
-        from: `Mailgun Sandbox <postmaster@${process.env.MAILGUN_DOMAIN as string}>`,
+        <p><a href="${ basePath }">${ basePath }</a></p>`
+      await resend.emails.send({
+        from: `Black Hole Basin <${ process.env.RESEND_FROM_EMAIL as string }>`,
         to: email,
         subject: 'Please confirm your Black Hole Basin account -- Account Activation',
-        html: message
-      }
-      await mailgunClient.messages.create(process.env.MAILGUN_DOMAIN as string, mailgunMessage)
+        html
+      })
       emailSent = true
     } catch (mailError: any) {
-      console.error('Mailgun error:', mailError.message)
+      console.error('Resend error:', mailError.message)
       console.log('User created but activation email could not be sent.')
     }
 
