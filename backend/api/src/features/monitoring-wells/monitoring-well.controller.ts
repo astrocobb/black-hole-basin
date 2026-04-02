@@ -1,13 +1,19 @@
 import { serverErrorResponse, zodErrorResponse } from '../../utils/response.utils'
-import { type Response } from 'express'
-import { insertMonitoringWell, type MonitoringWell, MonitoringWellModel } from './monitoring-well.model'
+import { type Request, type Response } from 'express'
+import {
+  type MonitoringWell,
+  MonitoringWellSchema,
+  insertMonitoringWell,
+  selectMonitoringWellById
+} from './monitoring-well.model'
+import { validateSessionUser } from '../../utils/auth.utils'
 
 
-export async function postMonitoringWell(request: Request, response: Response): Promise<void> {
+export async function postMonitoringWellController(request: Request, response: Response): Promise<void> {
 
   try {
 
-    const validationResult = MonitoringWellModel.safeParse(request.body)
+    const validationResult = MonitoringWellSchema.safeParse(request.body)
     if (!validationResult.success) {
       zodErrorResponse(response, validationResult.error)
       return
@@ -24,17 +30,18 @@ export async function postMonitoringWell(request: Request, response: Response): 
       return
     }
 
-    // if (!(await validateSessionUser(request, response, newMonitoringWell.client))) return
+    if (!(await validateSessionUser(request, response, newMonitoringWell.userId))) return
 
-    // const existingMonitoringWell = await selectMonitoringWellById(newMonitoringWell.id)
+    const existingMonitoringWell = await selectMonitoringWellById(newMonitoringWell.id)
 
-    // if (existingMonitoringWell) {
-    //   response.status(409).json({
-    //     status: 409,
-    //     data: null,
-    //     message: 'Post monitoring well failed. Monitoring well already exists.'
-    //   })
-    // }
+    if (existingMonitoringWell) {
+      response.status(409).json({
+        status: 409,
+        data: null,
+        message: 'Post monitoring well failed. Monitoring well already exists.'
+      })
+      return
+    }
 
     const message = await insertMonitoringWell(newMonitoringWell)
 

@@ -1,11 +1,12 @@
 import { Router } from 'express'
-import { postMonitoringWell } from './monitoring-well.controller'
+import { postMonitoringWellController } from './monitoring-well.controller'
+import { isSignedInController } from '../../utils/controllers/is-signed-in.controller'
 
 
 const basePath = '/api/monitoringWell' as const
 const router = Router()
 
 router.route('/')
-  .post(isLoggedInController, postMonitoringWell)
+  .post(isSignedInController, postMonitoringWellController)
 
 export const monitoringWell = { basePath, router }
