@@ -1,5 +1,11 @@
 DROP TABLE IF EXISTS monitoring_wells;
 
+CREATE TABLE IF NOT EXISTS client (
+    id UUID PRIMARY KEY,
+    role VARCHAR(16),
+
+);
+
 CREATE TABLE IF NOT EXISTS monitoring_wells
 (
     id             UUID PRIMARY KEY,

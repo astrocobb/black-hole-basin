@@ -1,4 +1,5 @@
 import { z } from 'zod/v4'
+import { sql } from '../../utils/database.utils'
 
 
 export const MonitoringWellSchema = z.object({
@@ -14,7 +15,33 @@ export const MonitoringWellSchema = z.object({
 
 export type MonitoringWell = z.infer<typeof MonitoringWellSchema>
 
+/**
+ *
+ * @param monitoringWell to be inserted
+ * @returns { Promise<string> } Monitoring Well successfully added to the database!
+ */
 export async function insertMonitoringWell(monitoringWell: MonitoringWell): Promise<string> {
 
-  return 'Monitoring well successfully inserted!'
+  MonitoringWellSchema.parse(monitoringWell)
+
+  const { id, depthToWater, siteNo, time, waterLevel } = monitoringWell
+
+  await sql `
+    INSERT INTO monitoring_wells (
+      id, 
+      site_no, 
+      time, 
+      depth_to_water, 
+      water_level
+    ) 
+    VALUES (
+      ${ id },
+      ${ depthToWater },
+      ${ siteNo },
+      ${ time },
+      ${ waterLevel }
+    ) 
+  `
+
+  return 'Monitoring Well successfully added to the database!'
 }
