@@ -39,43 +39,14 @@ export async function validatePassword(hash: string, password: string): Promise<
 }
 
 // validate the session user
-export async function validateSessionUser(request: Request, response: e.Response, userId: string | undefined): Promise<boolean> {
-
-  // if the user id is undefined or null, send a 403 and return false
-  if (!userId) {
-    response.status(403).json({
-      status: 403,
-      data: null,
-      message: 'Forbidden: You do not have access to this resource.'
-    })
-    return false
-  }
+export async function validateUser(request: Request, userId: string | undefined): Promise<boolean> {
 
   // get the user id from the session
   const sessionUser: User | undefined = request.session?.user
-
-  // if the user id from the session is undefined, send a 401 and return false
-  if (!sessionUser) {
-    response.status(401).json({
-      status: 401,
-      data: null,
-      message: 'Unauthorized: You must be signed in to access this resource.'
-    })
-    return false
-  }
 
   // get the user id from the session
   const sessionUserId = sessionUser?.id
 
   // check if the user id from the request body matches the user id from the session
-  if (userId !== sessionUserId) {
-    response.status(403).json({
-      status: 403,
-      data: null,
-      message: 'Forbidden: You do not own this resource.'
-    })
-    return false
-  }
-
-  return true
+  return userId === sessionUserId
 }

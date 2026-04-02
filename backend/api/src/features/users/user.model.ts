@@ -74,6 +74,25 @@ export async function updateUser(user: User): Promise<string> {
   return 'User successfully updated!'
 }
 
+export async function selectUserById(id: string): Promise<User | null> {
+
+  const rowList = await sql `
+    SELECT
+      id,
+      activation_token,
+      email,
+      hash,
+      name,
+      role
+    FROM users
+    WHERE id = ${ id }
+  `
+
+  const result = UserSchema.array().max(1).parse(rowList)
+
+  return result[0] ?? null
+}
+
 export async function selectUserByActivationToken(activationToken: string): Promise<User | null> {
 
   const rowList = await sql `
