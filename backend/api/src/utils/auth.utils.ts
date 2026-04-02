@@ -1,5 +1,5 @@
 import * as argon2 from 'argon2'
-import * as crypto from 'crypto'
+import * as crypto from 'node:crypto'
 
 
 export async function setHash(password: string): Promise<string> {

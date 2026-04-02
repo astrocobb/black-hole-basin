@@ -15,9 +15,9 @@ CREATE TABLE IF NOT EXISTS monitoring_wells
 (
     id             UUID PRIMARY KEY,
     user_id        UUID,
-    site_no        CHAR(128),   -- Identifying number for each monitoring well
     date_measured  TIMESTAMPTZ, -- Time reading was taken
-    water_level    CHAR(32),    -- Water level in feet relative to NAVD88
     depth_to_water CHAR(32),    -- Depth to Water Below Land Surface in ft
+    site_no        CHAR(128),   -- Identifying number for each monitoring well
+    water_level    CHAR(32),    -- Water level in feet relative to NAVD88
     FOREIGN KEY (user_id) REFERENCES users (id)
 );

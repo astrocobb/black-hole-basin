@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(git commit:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Read(//mnt/c/Users/trevo/WebstormProjects/**)",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(grep -E '\\\\.\\(tsx?|jsx?|css|json\\)$')",
+      "Bash(git rm:*)"
     ]
   }
 }

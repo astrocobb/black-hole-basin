@@ -38,15 +38,16 @@ export async function signUpController(request: Request, response: Response) {
         <h2>Welcome to Black Hole Basin!</h2>
         <p>You must confirm your account.</p>
         <p><a href="${ basePath }">${ basePath }</a></p>`
-      await resend.emails.send({
+      const emailResult = await resend.emails.send({
         from: `Black Hole Basin <${ process.env.RESEND_FROM_EMAIL as string }>`,
         to: email,
         subject: 'Please confirm your Black Hole Basin account -- Account Activation',
         html
       })
-      emailSent = true
+      console.log('Resend result:', emailResult)
+      emailSent = !emailResult.error
     } catch (mailError: any) {
-      console.error('Resend error:', mailError.message)
+      console.error('Resend error:', mailError)
       console.log('User created but activation email could not be sent.')
     }
 

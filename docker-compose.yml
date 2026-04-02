@@ -4,9 +4,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: dev
+      POSTGRES_USER: astro
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: dev-postgres
+      POSTGRES_DB: black-hole-basin-db
     volumes:
       - pgdata:/var/lib/postgresql/data
 

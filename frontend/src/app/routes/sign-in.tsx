@@ -2,33 +2,33 @@ import React, { useState } from 'react'
 
 
 export default function SignIn() {
-  const [isSignUp, setIsSignUp] = useState(false)
+  const [ isSignUp, setIsSignUp ] = useState(false)
 
   return (
     <div className="min-h-screen bg-gray-800 text-gray-100">
       <header className="border-b border-gray-700 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
           <h1 className="text-xl font-bold tracking-tight text-white">Black Hole Basin</h1>
-          <span className="text-sm text-gray-500">{isSignUp ? 'Create Account' : 'Sign In'}</span>
+          <span className="text-sm text-gray-500">{ isSignUp ? 'Create Account' : 'Sign In' }</span>
         </div>
       </header>
 
       <main className="mx-auto max-w-md px-6 py-10">
         <div className="rounded-md bg-gray-700 p-6 shadow-lg">
           <h2 className="mb-6 text-lg font-semibold text-gray-200">
-            {isSignUp ? 'Create Account' : 'Sign In'}
+            { isSignUp ? 'Create Account' : 'Sign In' }
           </h2>
 
-          {isSignUp ? <SignUpForm /> : <SignInForm />}
+          { isSignUp ? <SignUpForm/> : <SignInForm/> }
 
           <p className="mt-6 text-center text-sm text-gray-400">
-            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+            { isSignUp ? 'Already have an account?' : 'Don\'t have an account?' }{ ' ' }
             <button
               type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
+              onClick={ () => setIsSignUp(!isSignUp) }
               className="font-medium text-blue-400 transition hover:text-blue-300"
             >
-              {isSignUp ? 'Sign In' : 'Sign Up'}
+              { isSignUp ? 'Sign In' : 'Sign Up' }
             </button>
           </p>
         </div>
