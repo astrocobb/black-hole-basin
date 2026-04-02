@@ -6,6 +6,7 @@ import type { RedisClientType } from 'redis'
 import { RedisStore } from 'connect-redis'
 // routes
 import { signUpRoute } from './features/sign-up/sign-up.route'
+import { signInRoute } from './features/sign-in/sign-in.route'
 
 
 // app class that extends the express application
@@ -66,6 +67,7 @@ export class App {
   // private method for setting up routes in their basic sense
   private routes(): void {
     this.app.use(signUpRoute.basePath, signUpRoute.router)
+    this.app.use(signInRoute.basePath, signInRoute.router)
   }
 
   // starts the server and tells the terminal to post a message that the server is running and on what port

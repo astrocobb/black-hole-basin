@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 import { serverErrorResponse, zodErrorResponse } from '../../utils/response.utils'
 import { z } from 'zod/v4'
-import { selectUserByUserActivationToken, updateUser } from '../users/user.model'
+import { selectUserByActivationToken, updateUser } from '../users/user.model'
 
 
 export async function activationController(request: Request, response: Response): Promise<void> {
@@ -18,7 +18,7 @@ export async function activationController(request: Request, response: Response)
     }
 
     const { activation } = validationResult.data
-    const user = await selectUserByUserActivationToken(activation)
+    const user = await selectUserByActivationToken(activation)
 
     if (user === null) {
       response.json({

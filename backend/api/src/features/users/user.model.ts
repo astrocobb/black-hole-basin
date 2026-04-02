@@ -2,7 +2,7 @@ import { z } from 'zod/v4'
 import { sql } from '../../utils/database.utils'
 
 
-export const UserModel = z.object({
+export const UserSchema = z.object({
   id: z.uuidv7('Please provide a valid uuid for id.'),
   activationToken: z.string('Please provide a valid activation token.')
     .length(32, 'User activation token must be 32 characters.')
@@ -19,7 +19,7 @@ export const UserModel = z.object({
     .max(16, 'Role must be less than 16 characters.')
 })
 
-export type User = z.infer<typeof UserModel>
+export type User = z.infer<typeof UserSchema>
 
 /**
  * Inserts a new user into the database
@@ -28,7 +28,7 @@ export type User = z.infer<typeof UserModel>
  */
 export async function insertUser(user: User): Promise<string> {
 
-  UserModel.parse(user)
+  UserSchema.parse(user)
 
   const { id, activationToken, email, hash, name, role } = user
 
@@ -74,7 +74,7 @@ export async function updateUser(user: User): Promise<string> {
   return 'User successfully updated!'
 }
 
-export async function selectUserByUserActivationToken(activationToken: string): Promise<User | null> {
+export async function selectUserByActivationToken(activationToken: string): Promise<User | null> {
 
   const rowList = await sql `
     SELECT
@@ -88,7 +88,26 @@ export async function selectUserByUserActivationToken(activationToken: string): 
     WHERE activation_token = ${ activationToken }
   `
 
-  const result = UserModel.array().max(1).parse(rowList)
+  const result = UserSchema.array().max(1).parse(rowList)
+
+  return result[0] ?? null
+}
+
+export async function selectUserByEmail(email: string): Promise<User | null> {
+
+  const rowList = await sql `
+    SELECT
+      id,
+      activation_token,
+      email,
+      hash,
+      name,
+      role
+    FROM users
+    WHERE email = ${ email }
+  `
+
+  const result = UserSchema.array().max(1).parse(rowList)
 
   return result[0] ?? null
 }

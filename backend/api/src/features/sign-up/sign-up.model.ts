@@ -1,8 +1,8 @@
 import { z } from 'zod/v4'
-import { UserModel } from '../users/user.model'
+import { UserSchema } from '../users/user.model'
 
 
-export const SignUpUserSchema = UserModel
+export const SignUpUserSchema = UserSchema
   .omit({ hash: true, activationToken: true })
   .extend({
     password: z.string('password confirmation is required')
