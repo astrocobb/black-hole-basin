@@ -30,7 +30,7 @@ export async function postMonitoringWellController(request: Request, response: R
       response.status(401).json({
         status: 401,
         data: null,
-        message: 'Post monitoring well failed. Please sign in.'
+        message: 'Create monitoring well failed. Please sign in.'
       })
       return
     }
@@ -39,7 +39,7 @@ export async function postMonitoringWellController(request: Request, response: R
       response.status(403).json({
         status: 403,
         data: null,
-        message: 'Post monitoring well failed. You do not have authority to add monitoring wells.'
+        message: 'Create monitoring well failed. Admin role required.'
       })
       return
     }
@@ -48,19 +48,12 @@ export async function postMonitoringWellController(request: Request, response: R
       response.status(400).json({
         status: 400,
         data: null,
-        message: 'Post monitoring well failed. Monitoring well data is missing.'
+        message: 'Create monitoring well failed. Request body is missing.'
       })
       return
     }
 
-    if (!(await validateUser(request, newMonitoringWell.userId))) {
-      response.status(403).json({
-        status: 403,
-        data: null,
-        message: 'Forbidden: You do not have permission to create a monitoring well for this user.'
-      })
-      return
-    }
+    if (!validateUser(request, response, newMonitoringWell.userId)) return
 
     const existingMonitoringWell = await selectMonitoringWellById(newMonitoringWell.id)
 
@@ -68,17 +61,17 @@ export async function postMonitoringWellController(request: Request, response: R
       response.status(409).json({
         status: 409,
         data: null,
-        message: 'Post monitoring well failed. Monitoring well already exists.'
+        message: 'Create monitoring well failed. Monitoring well already exists.'
       })
       return
     }
 
-    const message = await insertMonitoringWell(newMonitoringWell)
+    await insertMonitoringWell(newMonitoringWell)
 
-    response.json({
-      status: 200,
+    response.status(201).json({
+      status: 201,
       data: null,
-      message: message
+      message: 'Successfully created monitoring well.'
     })
 
   } catch (error: any) {

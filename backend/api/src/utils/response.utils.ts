@@ -28,7 +28,7 @@ export function zodErrorResponse(response: Response, error: ZodError) {
   return errorResponse(
     response,
     createStatus(
-      418,
+      400,
       null,
       message
     )
@@ -41,7 +41,7 @@ export function zodErrorResponse(response: Response, error: ZodError) {
  * @param status
  */
 export function errorResponse(response: Response, status: Status): Response<Status> {
-  return response.json(status)
+  return response.status(status.status).json(status)
 }
 
 /**

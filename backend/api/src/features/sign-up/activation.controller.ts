@@ -21,10 +21,10 @@ export async function activationController(request: Request, response: Response)
     const user = await selectUserByActivationToken(activation)
 
     if (user === null) {
-      response.json({
+      response.status(400).json({
         status: 400,
         data: null,
-        message: 'Account activation has failed. Have you already activated this account?'
+        message: 'Activation failed. Invalid or already used activation token.'
       })
       return
     }
@@ -32,10 +32,10 @@ export async function activationController(request: Request, response: Response)
     user.activationToken = null
     await updateUser(user)
 
-    response.json({
+    response.status(200).json({
       status: 200,
       data: null,
-      message: 'Account activation was successful!'
+      message: 'Successfully activated account.'
     })
 
   } catch (error: any) {

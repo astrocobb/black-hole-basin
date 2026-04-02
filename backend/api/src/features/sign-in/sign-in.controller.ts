@@ -25,20 +25,20 @@ export async function signInController(request: Request, response: Response): Pr
     const user: User | null = await selectUserByEmail(email)
 
     const signInFailedStatus: Status = {
-      status: 400,
-      message: 'Email or password is incorrect. Try again.',
+      status: 401,
+      message: 'Sign in failed. Email or password is incorrect.',
       data: null
     }
 
     if (user === null) {
-      response.json(signInFailedStatus)
+      response.status(401).json(signInFailedStatus)
       return
     }
 
     const isPasswordValid = await validatePassword(user.hash, password)
 
     if (!isPasswordValid) {
-      response.json(signInFailedStatus)
+      response.status(401).json(signInFailedStatus)
       return
     }
 
@@ -61,9 +61,9 @@ export async function signInController(request: Request, response: Response): Pr
       authorization
     })
 
-    response.json({
+    response.status(200).json({
       status: 200,
-      message: 'Sign In successful!',
+      message: 'Successfully signed in.',
       data: null
     })
     return

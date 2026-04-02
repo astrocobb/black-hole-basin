@@ -2,7 +2,6 @@ import * as argon2 from 'argon2'
 import * as crypto from 'crypto'
 import { type Request, type Response } from 'express'
 import pkg from 'jsonwebtoken'
-import type { User } from '../features/users/user.model.ts'
 const { sign } = pkg
 
 
@@ -38,15 +37,26 @@ export async function validatePassword(hash: string, password: string): Promise<
   return await argon2.verify(hash, password)
 }
 
-// validate the session user
-export async function validateUser(request: Request, userId: string | undefined): Promise<boolean> {
+// validate the session user matches the resource owner
+export function validateUser(request: Request, response: Response, userId: string | undefined): boolean {
 
-  // get the user id from the session
-  const sessionUser: User | undefined = request.session?.user
+  if (!userId) {
+    response.status(403).json({
+      status: 403,
+      data: null,
+      message: 'Forbidden: You do not have access to this resource.'
+    })
+    return false
+  }
 
-  // get the user id from the session
-  const sessionUserId = sessionUser?.id
+  if (userId !== request.session?.user?.id) {
+    response.status(403).json({
+      status: 403,
+      data: null,
+      message: 'Forbidden: You do not own this resource.'
+    })
+    return false
+  }
 
-  // check if the user id from the request body matches the user id from the session
-  return userId === sessionUserId
+  return true
 }

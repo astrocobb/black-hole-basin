@@ -52,14 +52,14 @@ export async function signUpController(request: Request, response: Response) {
     }
 
     const status: Status = {
-      status: 200,
+      status: 201,
       message: emailSent
-        ? 'User successfully created! Please check your email.'
-        : 'User successfully created! (Note: Activation email could not be sent. Please contact support.)',
+        ? 'Successfully signed up. Please check your email to activate your account.'
+        : 'Successfully signed up. Activation email could not be sent. Please contact support.',
       data: null
     }
 
-    response.status(200).json(status)
+    response.status(201).json(status)
 
   } catch (error: any) {
     console.error(error)

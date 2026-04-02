@@ -11,7 +11,7 @@ export function isSignedInController(request: Request, response: Response, next:
   const status: Status = {
     status: 401,
     data: null,
-    message: 'Please sign in.'
+    message: 'Unauthorized. Please sign in.'
   }
 
   try {
@@ -23,7 +23,7 @@ export function isSignedInController(request: Request, response: Response, next:
     const unverifiedJwtToken: string | undefined = request.headers?.authorization
 
     if (user === undefined || signature === undefined || unverifiedJwtToken === undefined) {
-      response.json(status)
+      response.status(401).json(status)
       return
     }
 
