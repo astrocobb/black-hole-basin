@@ -1,7 +1,7 @@
 import { type Request, type Response } from 'express'
 import { serverErrorResponse, zodErrorResponse } from '../../utils/response.utils'
 import { selectUserById, type User, UserSchema } from './user.model'
-import { validateUser } from '../../utils/auth.utils'
+import { validUser } from '../../utils/auth.utils'
 
 
 export async function getUserByIdController(request: Request, response: Response): Promise<void> {
@@ -16,7 +16,7 @@ export async function getUserByIdController(request: Request, response: Response
 
     const { id } = validationResult.data
 
-    if (!validateUser(request, response, id)) return
+    if (!validUser(request, response, id)) return
 
     const user: User | null = await selectUserById(id)
     if (!user) {

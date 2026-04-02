@@ -36,4 +36,5 @@ __pycache__/
 
 # Dev Stuff
 .react-router
+.claude
 *.csv

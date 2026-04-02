@@ -6,7 +6,7 @@ import {
   insertMonitoringWell,
   selectMonitoringWellById
 } from './monitoring-well.model'
-import { validateUser } from '../../utils/auth.utils'
+import { validUser } from '../../utils/auth.utils'
 import { selectUserById, type User } from '../users/user.model'
 
 
@@ -22,7 +22,6 @@ export async function postMonitoringWellController(request: Request, response: R
 
     const newMonitoringWell: MonitoringWell = validationResult.data
 
-    // ADD ROLE CHECKER
     const userId: string = newMonitoringWell.userId
     const user: User | null = await selectUserById(userId)
 
@@ -53,7 +52,7 @@ export async function postMonitoringWellController(request: Request, response: R
       return
     }
 
-    if (!validateUser(request, response, newMonitoringWell.userId)) return
+    if (!validUser(request, response, newMonitoringWell.userId)) return
 
     const existingMonitoringWell = await selectMonitoringWellById(newMonitoringWell.id)
 

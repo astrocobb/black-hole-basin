@@ -33,12 +33,12 @@ export function setActivationToken(): string {
   return crypto.randomBytes(16).toString('hex')
 }
 
-export async function validatePassword(hash: string, password: string): Promise<boolean> {
+export async function validPassword(hash: string, password: string): Promise<boolean> {
   return await argon2.verify(hash, password)
 }
 
 // validate the session user matches the resource owner
-export function validateUser(request: Request, response: Response, userId: string | undefined): boolean {
+export function validUser(request: Request, response: Response, userId: string | undefined): boolean {
 
   if (!userId) {
     response.status(403).json({

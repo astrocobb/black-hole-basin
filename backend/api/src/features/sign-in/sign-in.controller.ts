@@ -4,7 +4,7 @@ import { type User, UserSchema, selectUserByEmail } from '../users/user.model'
 import { serverErrorResponse, zodErrorResponse } from '../../utils/response.utils'
 import type { Status } from '../../utils/interfaces/Status'
 import { v7 as uuid } from 'uuid'
-import { generateJwt, validatePassword } from '../../utils/auth.utils'
+import { generateJwt, validPassword } from '../../utils/auth.utils'
 
 
 export async function signInController(request: Request, response: Response): Promise<void> {
@@ -35,7 +35,7 @@ export async function signInController(request: Request, response: Response): Pr
       return
     }
 
-    const isPasswordValid = await validatePassword(user.hash, password)
+    const isPasswordValid = await validPassword(user.hash, password)
 
     if (!isPasswordValid) {
       response.status(401).json(signInFailedStatus)

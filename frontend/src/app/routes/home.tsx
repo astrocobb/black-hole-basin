@@ -7,47 +7,55 @@ export default function Home() {
       <header className="border-b border-gray-700 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
           <h1 className="text-xl font-bold tracking-tight text-white">Black Hole Basin</h1>
-          <span className="text-sm text-gray-500">Well Depth Calculator</span>
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-6 py-10">
-        <div className="rounded-md bg-gray-700 p-6 shadow-lg">
-          <h2 className="mb-6 text-lg font-semibold text-gray-200">Enter Coordinates</h2>
+      <main className="mx-auto max-w-4xl px-6 py-24">
+        <div className="text-center">
+          <h2 className="text-4xl font-bold tracking-tight text-white">
+            Well Depth Calculator
+          </h2>
+          <p className="mt-4 text-lg text-gray-400">
+            Calculate optimal well designs using geographic coordinates and subsurface data.
+          </p>
+        </div>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div className="flex flex-col gap-2">
-              <label htmlFor="latitude" className="text-sm font-medium text-gray-400">
-                Latitude
-              </label>
-              <input
-                id="latitude"
-                type="number"
-                step="any"
-                placeholder="34.6628"
-                className="rounded-md border border-gray-600 bg-gray-700 px-4 py-2.5 text-gray-100 placeholder-gray-500 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="longitude" className="text-sm font-medium text-gray-400">
-                Longitude
-              </label>
-              <input
-                id="longitude"
-                type="number"
-                step="any"
-                placeholder="-106.7764"
-                className="rounded-md border border-gray-600 bg-gray-700 px-4 py-2.5 text-gray-100 placeholder-gray-500 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
+        <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-3">
+          <div className="rounded-md bg-gray-700 p-6 shadow-lg">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-blue-400">Coordinate Input</h3>
+            <p className="mt-2 text-sm text-gray-400">
+              Enter latitude and longitude to target a specific drilling location.
+            </p>
           </div>
 
-          <button
-            type="button"
-            className="mt-8 w-full rounded-md bg-blue-600 px-4 py-2.5 font-medium text-white transition hover:bg-blue-500 active:bg-blue-700"
+          <div className="rounded-md bg-gray-700 p-6 shadow-lg">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-blue-400">Depth Analysis</h3>
+            <p className="mt-2 text-sm text-gray-400">
+              Get calculated well depth recommendations based on subsurface conditions.
+            </p>
+          </div>
+
+          <div className="rounded-md bg-gray-700 p-6 shadow-lg">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-blue-400">Monitoring</h3>
+            <p className="mt-2 text-sm text-gray-400">
+              Track and monitor well status through a centralized dashboard.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-12 flex justify-center gap-4">
+          <a
+            href="/dashboard"
+            className="rounded-md bg-blue-600 px-6 py-2.5 font-medium text-white transition hover:bg-blue-500 active:bg-blue-700"
           >
-            Calculate Well Design
-          </button>
+            Go to Dashboard
+          </a>
+          <a
+            href="/sign-in"
+            className="rounded-md border border-gray-600 px-6 py-2.5 font-medium text-gray-300 transition hover:bg-gray-700"
+          >
+            Sign In
+          </a>
         </div>
       </main>
     </div>
