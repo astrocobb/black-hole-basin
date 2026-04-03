@@ -40,7 +40,7 @@ export async function getUserByIdController(request: Request, response: Response
     }
 
     // Strip sensitive fields before sending to the client
-    const { hash, activationToken, ...safeUser } = user
+    const { hash, ...safeUser } = user
 
     response.status(200).json({
       status: 200,

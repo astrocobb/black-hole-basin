@@ -12,12 +12,11 @@ export async function insertUser(user: User): Promise<string> {
 
   UserSchema.parse(user)
 
-  const { id, activationToken, email, hash, name, role } = user
+  const { id, email, hash, name, role } = user
 
   await sql `
     INSERT INTO users (
       id,
-      activation_token,
       email,
       hash,
       name,
@@ -25,7 +24,6 @@ export async function insertUser(user: User): Promise<string> {
     )
     VALUES (
       ${ id },
-      ${ activationToken },
       ${ email },
       ${ hash },
       ${ name },
@@ -37,20 +35,20 @@ export async function insertUser(user: User): Promise<string> {
 
 /**
  * Updates an existing user row in the database by ID.
- *  { User} user - The user object with updated fields.
- *  { Promise<string>} A success confirmation message.
+ * @param { User } user - The user object with updated fields.
+ * @returns { Promise<string> } A success confirmation message.
  */
 export async function updateUser(user: User): Promise<string> {
 
-  const { id, activationToken, email, hash, name, role } = user
+  const { id, email, hash, name, role } = user
 
   await sql `
     UPDATE users
-    SET activation_token = ${ activationToken },
-        email = ${ email },
-        hash = ${ hash },
-        name = ${ name },
-        role = ${ role }
+    SET 
+      email = ${ email },
+      hash = ${ hash },
+      name = ${ name },
+      role = ${ role }
     WHERE id = ${ id }
   `
   return 'User successfully updated!'
@@ -66,7 +64,6 @@ export async function selectUserById(id: string): Promise<User | null> {
   const rowList = await sql `
     SELECT
       id,
-      activation_token,
       email,
       hash,
       name,
@@ -76,31 +73,6 @@ export async function selectUserById(id: string): Promise<User | null> {
   `
 
   // Parse and validate the query result, expecting at most one row
-  const result = UserSchema.array().max(1).parse(rowList)
-
-  return result[0] ?? null
-}
-
-/**
- * Selects a single user by their activation token.
- * Used during the account activation flow to look up the pending user.
- * @param { string } activationToken - The 32-character hex activation token.
- * @returns { Promise<User | null> } The matching user, or null if the token is invalid.
- */
-export async function selectUserByActivationToken(activationToken: string): Promise<User | null> {
-
-  const rowList = await sql `
-    SELECT
-      id,
-      activation_token,
-      email,
-      hash,
-      name,
-      role
-    FROM users
-    WHERE activation_token = ${ activationToken }
-  `
-
   const result = UserSchema.array().max(1).parse(rowList)
 
   return result[0] ?? null
@@ -117,7 +89,6 @@ export async function selectUserByEmail(email: string): Promise<User | null> {
   const rowList = await sql `
     SELECT
       id,
-      activation_token,
       email,
       hash,
       name,

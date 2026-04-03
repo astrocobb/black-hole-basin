@@ -75,3 +75,12 @@ React Router 7 with SSR enabled. Tailwind CSS 4 via Vite plugin. Dark theme (gra
 - REST endpoints use plural kebab-case nouns (`/api/monitoring-wells`, `/api/users`)
 - Role-based access: check `user.role` in controllers (e.g., `admin` required for monitoring well creation)
 - Frontend pages share a consistent layout: dark `bg-gray-800` wrapper, bordered header with "Black Hole Basin" title, `max-w-4xl` centered content
+
+## TODO
+
+- [ ] Fix activation flow — `auth.repository.ts` `selectUserActivationByToken` return type doesn't match `User | null`, activation endpoint is broken
+- [ ] Update `monitoring-wells.schema.ts` to match SQL columns (`locationId`, `locationName`, `stateCode`, `countyCode`, `altitude`, `holeDepth`, `wellDepth`, `dateDrilled`)
+- [ ] Update `monitoring-wells.repository.ts` queries to use real SQL columns including PostGIS `geom`
+- [ ] Create `monitoring-well-data` feature (schema, repository, controller, route) for time-series readings (`depthToWater`, `dateMeasured`)
+- [ ] Update `updateUser` in `users.repository.ts` to set `updated_at = now()`
+- [ ] Remove commented-out `selectUserByActivationToken` from `users.repository.ts`

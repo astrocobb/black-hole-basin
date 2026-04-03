@@ -4,10 +4,11 @@ import { serverErrorResponse, zodErrorResponse } from '../../lib/response'
 import { v7 as uuid } from 'uuid'
 import { Resend } from 'resend'
 import { type User, UserSchema } from '../users/users.schema'
-import { insertUser, updateUser, selectUserByActivationToken, selectUserByEmail } from '../users/users.repository'
+import { insertUser, selectUserByEmail } from '../users/users.repository'
 import type { Status } from '../../types/Status'
 import { generateJwt, validPassword, setHash, setActivationToken } from '../../lib/auth'
-import { SignUpSchema } from './auth.schemas'
+import { SignUpSchema, type UserActivation } from './auth.schemas'
+import { deleteUserActivation, insertUserActivation, selectUserActivationByToken } from './auth.repository'
 
 
 /**
@@ -114,19 +115,22 @@ export async function signUpController(request: Request, response: Response): Pr
     // Hash the plaintext password for secure storage
     const hash = await setHash(password)
 
-    // Generate a random activation token for email verification
-    const activationToken = setActivationToken()
-
     const user: User = {
       id,
-      activationToken,
       email,
       hash,
       name,
       role
     }
 
+    // Insert the new user into the database
     await insertUser(user)
+
+    // Generate a random activation token for email verification
+    const activationToken = setActivationToken()
+
+    // Store the activation token in the database
+    await insertUserActivation(id, activationToken)
 
     // Attempt to send the activation email (non-blocking failure)
     let emailSent = false
@@ -184,7 +188,7 @@ export async function activationController(request: Request, response: Response)
 
     // Validate that the activation token is present and the correct length
     const validationResult = z.object({
-      activation: z.string('Activation is required.').length(32, 'Please provide a valid activation token.')
+      token: z.string('Activation is required.').length(32, 'Please provide a valid activation token.')
     }).safeParse(request.body)
 
     if (!validationResult.success) {
@@ -192,12 +196,12 @@ export async function activationController(request: Request, response: Response)
       return
     }
 
-    const { activation } = validationResult.data
+    const { token } = validationResult.data
 
     // Find the user associated with this activation token
-    const user = await selectUserByActivationToken(activation)
+    const userActivation: UserActivation | null = await selectUserActivationByToken(token)
 
-    if (user === null) {
+    if (userActivation === null) {
       response.status(400).json({
         status: 400,
         data: null,
@@ -206,9 +210,8 @@ export async function activationController(request: Request, response: Response)
       return
     }
 
-    // Clear the activation token to mark the account as activated
-    user.activationToken = null
-    await updateUser(user)
+    // Delete the User Activation row from the database to mark the account as active
+    await deleteUserActivation(userActivation.userId)
 
     response.status(200).json({
       status: 200,

@@ -9,7 +9,7 @@ import { UserSchema } from '../users/users.schema'
  * Includes a refinement to ensure both password fields match.
  */
 export const SignUpSchema = UserSchema
-  .omit({ hash: true, activationToken: true })
+  .omit({ hash: true })
   .extend({
     password: z.string('password confirmation is required')
       .min(8, 'User password cannot be less than 8 characters long.')
@@ -21,3 +21,13 @@ export const SignUpSchema = UserSchema
   .refine(data => data.password === data.passwordConfirm, {
     message: 'Passwords do not match!'
   })
+
+export const UserActivationSchema = z.object({
+  userId: z.string('Please provide a valid token.'),
+  token: z.string('Please provide a valid token.')
+    .length(32, 'Token must be 32 characters.'),
+  expiresAt: z.iso.datetime({ offset: true }),
+  createdAt: z.iso.datetime({ offset: true })
+})
+
+export type UserActivation = z.infer<typeof UserActivationSchema>
