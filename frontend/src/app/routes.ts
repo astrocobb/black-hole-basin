@@ -1,9 +1,13 @@
 import { type RouteConfig, index, route } from '@react-router/dev/routes'
 
 
+/**
+ * Application route configuration.
+ * Maps URL paths to their corresponding route components.
+ */
 export default [
-  index('routes/home.tsx'),
-  route('dashboard', 'routes/dashboard.tsx'),
-  route('sign-in', 'routes/sign-in.tsx'),
-  route('activate', 'routes/activate.tsx')
+  index('routes/home.tsx'),                   // / - Landing page
+  route('dashboard', 'routes/dashboard.tsx'), // /dashboard - Well depth calculator
+  route('sign-in', 'routes/sign-in.tsx'),     // /sign-in - Authentication page
+  route('activate', 'routes/activate.tsx')    // /activate - Account activation page
 ] satisfies RouteConfig

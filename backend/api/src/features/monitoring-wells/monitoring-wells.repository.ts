@@ -1,23 +1,12 @@
-import { z } from 'zod/v4'
-import { sql } from '../../utils/database.utils'
-import { UserSchema } from '../users/user.model'
+import { sql } from '../../lib/db'
+import { type MonitoringWell, MonitoringWellSchema } from './monitoring-wells.schema'
 
-
-export const MonitoringWellSchema = z.object({
-  id: z.uuidv7('Please provide a valid uuid for id.'),
-  userId: z.uuidv7('Please provide a valid uuid for user id.'),
-  dateMeasured: z.iso.datetime({ offset: true }),
-  depthToWater: z.coerce.number('Please provide a valid number for depth to water.'),
-  siteNo: z.coerce.number('Please provide a valid number for site no.'),
-  waterLevel: z.coerce.number('Please provide a valid number for water level.')
-})
-
-export type MonitoringWell = z.infer<typeof MonitoringWellSchema>
 
 /**
- *
- * @param monitoringWell to be inserted
- * @returns { Promise<string> } Monitoring Well successfully added to the database!
+ * Inserts a new monitoring well row into the database.
+ * Validates the monitoring well object against MonitoringWellSchema before inserting.
+ * @param { MonitoringWell } monitoringWell - The monitoring well object to insert.
+ * @returns { Promise<string> } A success confirmation message.
  */
 export async function insertMonitoringWell(monitoringWell: MonitoringWell): Promise<string> {
 
@@ -47,10 +36,15 @@ export async function insertMonitoringWell(monitoringWell: MonitoringWell): Prom
   return 'Monitoring Well successfully added to the database!'
 }
 
+/**
+ * Selects a single monitoring well by its unique ID.
+ *  { string } id - The UUID v7 of the monitoring well to find.
+ *  { Promise<MonitoringWell | null> } The matching monitoring well, or null if not found.
+ */
 export async function selectMonitoringWellById(id: string): Promise<MonitoringWell | null> {
 
   const rowList = await sql `
-    SELECT 
+    SELECT
       id,
       user_id,
       date_measured,
@@ -61,6 +55,7 @@ export async function selectMonitoringWellById(id: string): Promise<MonitoringWe
     WHERE id = ${ id }
   `
 
+  // Parse and validate the query result, expecting at most one row
   const result = MonitoringWellSchema.array().max(1).parse(rowList)
 
   return result[0] ?? null

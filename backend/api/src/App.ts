@@ -4,21 +4,28 @@ import session from 'express-session'
 import cors from 'cors'
 import type { RedisClientType } from 'redis'
 import { RedisStore } from 'connect-redis'
-// routes
-import { signUpRoute } from './features/sign-up/sign-up.route'
-import { signInRoute } from './features/sign-in/sign-in.route'
-import { monitoringWell } from './features/monitoring-wells/monitoring-well.route'
-import { userRoute } from './features/users/user.route'
+// Route imports
+import { authRoute } from './features/auth/auth.route'
+import { usersRoute } from './features/users/users.route'
+import { monitoringWellsRoute } from './features/monitoring-wells/monitoring-wells.route'
 
 
-// app class that extends the express application
+/**
+ * Core application class that configures and starts the Express server.
+ * Handles middleware setup, session management, and route registration.
+ */
 export class App {
 
-  // properties for the app, settings, middlewares, and routes
+  // The underlying Express application instance.
   app: Application
+
+  // Redis-backed session store for persisting user sessions.
   redisStore: RedisStore
 
-  // constructor that takes in a redis client and sets up the app, settings, middlewares, and routes
+  /**
+   * Creates a new App instance with a connected Redis client.
+   * @param { RedisClientType } redisClient - Active Redis client used for session storage.
+   */
   constructor(redisClient: RedisClientType) {
     this.redisStore = new RedisStore({ client: redisClient })
     this.app = express()
@@ -28,53 +35,66 @@ export class App {
     this.routes()
   }
 
-  // private method that sets the port for the sever, to one from index.route.ts, and external .env.production.development file or defaults to 3000
+  /**
+   * Configures application-level settings such as the server port.
+   * Currently, a no-op placeholder for future configuration.
+   */
   public settings(): void {}
 
-  // private method to setting up the middleware to handle JSON responses, one for dev and one for prod
+  /**
+   * Registers all middleware in the correct order:
+   * CORS, logging, JSON parsing, session management, and session touch.
+   */
   private middlewares(): void {
 
-    // Add CORS first - allows the frontend to communicate with the backend
+    // CORS must come first so preflight requests are handled before other middleware
     this.app.use(cors({
-      origin: 'http://localhost:5173', // Change this to match your React dev server port
-      credentials: true // CRITICAL: allows session cookies to be sent
+      origin: 'http://localhost:5173',
+      credentials: true // Required for session cookies to be sent cross-origin
     }))
 
+    // HTTP request logger for development
     this.app.use(morgan('dev'))
+
+    // Parse incoming JSON request bodies
     this.app.use(express.json())
 
-    // Session configuration with automatic timeout
+    // Session configuration with Redis store and automatic timeout
     this.app.use(session({
       store: this.redisStore,
       saveUninitialized: false,
       secret: process.env.SESSION_SECRET as string,
       resave: false,
       cookie: {
-        maxAge: 2 * 60 * 60 * 1000, // Session expires after 1 hour of inactivity
-        httpOnly: true, // Prevents JavaScript from accessing the cookie
-        secure: false, // Set to true in production with HTTPS
-        sameSite: 'lax' // Helps protect against CSRF attacks
+        maxAge: 2 * 60 * 60 * 1000, // 2-hour session expiry
+        httpOnly: true,              // Prevents client-side JavaScript access
+        secure: false,               // Set to true in production with HTTPS
+        sameSite: 'lax'              // CSRF protection
       }
     }))
 
-    // Middleware to reset the session timeout on each request
+    // Reset the session expiry timer on every request to keep active sessions alive
     this.app.use((req, res, next) => {
       if (req.session) {
-        req.session.touch() // Resets the maxAge timer
+        req.session.touch()
       }
       next()
     })
   }
 
-  // private method for setting up routes in their basic sense
+  /**
+   * Mounts all feature route modules onto the Express app.
+   * Each route module provides its own base path and router.
+   */
   private routes(): void {
-    this.app.use(signUpRoute.basePath, signUpRoute.router)
-    this.app.use(signInRoute.basePath, signInRoute.router)
-    this.app.use(userRoute.basePath, userRoute.router)
-    this.app.use(monitoringWell.basePath, monitoringWell.router)
+    this.app.use(authRoute.basePath, authRoute.router)
+    this.app.use(usersRoute.basePath, usersRoute.router)
+    this.app.use(monitoringWellsRoute.basePath, monitoringWellsRoute.router)
   }
 
-  // starts the server and tells the terminal to post a message that the server is running and on what port
+  /**
+   * Starts the Express server on port 4200.
+   */
   public listen(): void  {
     this.app.listen(4200)
     console.log('Express application built successfully!')

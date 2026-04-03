@@ -1,19 +1,25 @@
-import { serverErrorResponse, zodErrorResponse } from '../../utils/response.utils'
 import { type Request, type Response } from 'express'
-import {
-  type MonitoringWell,
-  MonitoringWellSchema,
-  insertMonitoringWell,
-  selectMonitoringWellById
-} from './monitoring-well.model'
-import { validUser } from '../../utils/auth.utils'
-import { selectUserById, type User } from '../users/user.model'
+import { serverErrorResponse, zodErrorResponse } from '../../lib/response'
+import { validUser } from '../../lib/auth'
+import { type User } from '../users/users.schema'
+import { selectUserById } from '../users/users.repository'
+import { type MonitoringWell, MonitoringWellSchema } from './monitoring-wells.schema'
+import { insertMonitoringWell, selectMonitoringWellById } from './monitoring-wells.repository'
 
 
+/**
+ * Handles the creation of a new monitoring well record.
+ * Requires the requesting user to have the "admin" role and to own the resource.
+ * Checks for duplicate wells before inserting.
+ * @param { Request } request - Express request containing monitoring well data in the body.
+ * @param { Response } response - Express response for sending the result or errors.
+ * @returns { Promise<void> } Responds with 201 on success, or 400/401/403/409 on failure.
+ */
 export async function postMonitoringWellController(request: Request, response: Response): Promise<void> {
 
   try {
 
+    // Validate the request body against the monitoring well schema
     const validationResult = MonitoringWellSchema.safeParse(request.body)
     if (!validationResult.success) {
       zodErrorResponse(response, validationResult.error)
@@ -22,6 +28,7 @@ export async function postMonitoringWellController(request: Request, response: R
 
     const newMonitoringWell: MonitoringWell = validationResult.data
 
+    // Verify the referenced user exists
     const userId: string = newMonitoringWell.userId
     const user: User | null = await selectUserById(userId)
 
@@ -34,6 +41,7 @@ export async function postMonitoringWellController(request: Request, response: R
       return
     }
 
+    // Only admins are allowed to create monitoring wells
     if (user.role !== 'admin') {
       response.status(403).json({
         status: 403,
@@ -43,6 +51,7 @@ export async function postMonitoringWellController(request: Request, response: R
       return
     }
 
+    // Guard against missing request body (defensive check)
     if (!newMonitoringWell) {
       response.status(400).json({
         status: 400,
@@ -52,8 +61,10 @@ export async function postMonitoringWellController(request: Request, response: R
       return
     }
 
+    // Ensure the session user owns the resource
     if (!validUser(request, response, newMonitoringWell.userId)) return
 
+    // Check for duplicate monitoring well by ID
     const existingMonitoringWell = await selectMonitoringWellById(newMonitoringWell.id)
 
     if (existingMonitoringWell) {

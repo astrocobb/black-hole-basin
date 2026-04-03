@@ -1,8 +1,14 @@
 import { z } from 'zod/v4'
-import { UserSchema } from '../users/user.model'
+import { UserSchema } from '../users/users.schema'
 
 
-export const SignUpUserSchema = UserSchema
+/**
+ * Zod schema for validating sign-up request bodies.
+ * Extends the base UserSchema by replacing `hash` and `activationToken`
+ * (server-generated) with `password` and `passwordConfirm` (user-provided).
+ * Includes a refinement to ensure both password fields match.
+ */
+export const SignUpSchema = UserSchema
   .omit({ hash: true, activationToken: true })
   .extend({
     password: z.string('password confirmation is required')

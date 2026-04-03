@@ -11,6 +11,11 @@ import type { Route } from './+types/root'
 import './app.css'
 
 
+/**
+ * Preloads external font resources for the application.
+ * Connects to Google Fonts and loads the Inter typeface.
+ *  { Array} Array of link descriptors for font preconnection and stylesheet.
+ */
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
   {
@@ -24,6 +29,13 @@ export const links: Route.LinksFunction = () => [
   }
 ]
 
+/**
+ * Root HTML layout component that wraps every page.
+ * Provides the base document structure including head meta tags,
+ * scroll restoration, and client-side script hydration.
+ *  { { children: React.ReactNode }} props - The child route content to render.
+ *  { JSX.Element} The full HTML document shell.
+ */
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -42,15 +54,26 @@ export function Layout({ children }: { children: React.ReactNode }) {
   )
 }
 
+/**
+ * Root application component that renders the matched child route.
+ *  { JSX.Element} The Outlet component for nested route rendering.
+ */
 export default function App() {
   return <Outlet/>
 }
 
+/**
+ * Global error boundary that catches route and runtime errors.
+ * Displays a user-friendly error message, with stack traces shown only in development.
+ *  { { error: unknown }} props - The error caught by the boundary.
+ *  { JSX.Element} An error page with status message and optional stack trace.
+ */
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = 'Oops!'
   let details = 'An unexpected error occurred.'
   let stack: string | undefined
 
+  // Display specific messages for route errors (e.g. 404)
   if (isRouteErrorResponse(error)) {
     message = error.status === 404 ? '404' : 'Error'
     details =
@@ -58,6 +81,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         ? 'The requested page could not be found.'
         : error.statusText || details
   } else if (import.meta.env.DEV && error && error instanceof Error) {
+    // Show detailed error info only in development mode
     details = error.message
     stack = error.stack
   }

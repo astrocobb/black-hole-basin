@@ -1,30 +1,12 @@
-import { z } from 'zod/v4'
-import { sql } from '../../utils/database.utils'
+import { sql } from '../../lib/db'
+import { type User, UserSchema } from './users.schema'
 
-
-export const UserSchema = z.object({
-  id: z.uuidv7('Please provide a valid uuid for id.'),
-  activationToken: z.string('Please provide a valid activation token.')
-    .length(32, 'User activation token must be 32 characters.')
-    .nullable(),
-  email: z.string('Please provide a valid email address.')
-    .max(128, 'Email address must be less than 128 characters.'),
-  hash: z.string('Please provide a valid hash.')
-    .length(97, 'Hash address must be 97 characters (argon2).'),
-  name: z.string('Please provide a valid name.')
-    .min(1, 'Name must be at least 1 character.')
-    .max(32, 'Name must be less than 32 characters.'),
-  role: z.string('Please provide a valid role.')
-    .min(1, 'Role must be at least 1 character.')
-    .max(16, 'Role must be less than 16 characters.')
-})
-
-export type User = z.infer<typeof UserSchema>
 
 /**
- * Inserts a new user into the database
- * @param user that will be put in the database
- * @returns { Promise<string> } 'User successfully created!'
+ * Inserts a new user row into the database.
+ * Validates the user object against UserSchema before inserting.
+ * @param { User } user - The user object to insert.
+ * @returns { Promise<string> }  A success confirmation message.
  */
 export async function insertUser(user: User): Promise<string> {
 
@@ -34,13 +16,13 @@ export async function insertUser(user: User): Promise<string> {
 
   await sql `
     INSERT INTO users (
-      id, 
-      activation_token, 
-      email, 
-      hash, 
-      name, 
+      id,
+      activation_token,
+      email,
+      hash,
+      name,
       role
-    ) 
+    )
     VALUES (
       ${ id },
       ${ activationToken },
@@ -54,16 +36,16 @@ export async function insertUser(user: User): Promise<string> {
 }
 
 /**
- * Updates a user in the database.
- * @param user that will be updated.
- * returns { Promise<string> } 'User successfully updated!'
+ * Updates an existing user row in the database by ID.
+ *  { User} user - The user object with updated fields.
+ *  { Promise<string>} A success confirmation message.
  */
 export async function updateUser(user: User): Promise<string> {
 
   const { id, activationToken, email, hash, name, role } = user
 
   await sql `
-    UPDATE users 
+    UPDATE users
     SET activation_token = ${ activationToken },
         email = ${ email },
         hash = ${ hash },
@@ -74,6 +56,11 @@ export async function updateUser(user: User): Promise<string> {
   return 'User successfully updated!'
 }
 
+/**
+ * Selects a single user by their unique ID.
+ * @param { string } id - The UUID v7 of the user to find.
+ * @returns { Promise<User | null> } The matching user, or null if not found.
+ */
 export async function selectUserById(id: string): Promise<User | null> {
 
   const rowList = await sql `
@@ -88,11 +75,18 @@ export async function selectUserById(id: string): Promise<User | null> {
     WHERE id = ${ id }
   `
 
+  // Parse and validate the query result, expecting at most one row
   const result = UserSchema.array().max(1).parse(rowList)
 
   return result[0] ?? null
 }
 
+/**
+ * Selects a single user by their activation token.
+ * Used during the account activation flow to look up the pending user.
+ * @param { string } activationToken - The 32-character hex activation token.
+ * @returns { Promise<User | null> } The matching user, or null if the token is invalid.
+ */
 export async function selectUserByActivationToken(activationToken: string): Promise<User | null> {
 
   const rowList = await sql `
@@ -112,6 +106,12 @@ export async function selectUserByActivationToken(activationToken: string): Prom
   return result[0] ?? null
 }
 
+/**
+ * Selects a single user by their email address.
+ * Used during sign-in to look up the user's credentials.
+ * @param { string } email - The email address to search for.
+ * @returns { Promise<User | null> } The matching user, or null if not found.
+ */
 export async function selectUserByEmail(email: string): Promise<User | null> {
 
   const rowList = await sql `

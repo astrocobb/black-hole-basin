@@ -1,9 +1,15 @@
 import React from 'react'
 
 
+/**
+ * Dashboard page component for the well depth calculator.
+ * Provides coordinate input fields (latitude/longitude) and a calculate button.
+ *  { JSX.Element} The dashboard page layout.
+ */
 export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-800 text-gray-100">
+      {/* Site header with page subtitle */}
       <header className="border-b border-gray-700 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
           <h1 className="text-xl font-bold tracking-tight text-white">Black Hole Basin</h1>
@@ -15,6 +21,7 @@ export default function Dashboard() {
         <div className="rounded-md bg-gray-700 p-6 shadow-lg">
           <h2 className="mb-6 text-lg font-semibold text-gray-200">Enter Coordinates</h2>
 
+          {/* Coordinate input fields in a two-column grid */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
               <label htmlFor="latitude" className="text-sm font-medium text-gray-400">

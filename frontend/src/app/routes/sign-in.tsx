@@ -1,11 +1,18 @@
 import React, { useState } from 'react'
 
 
+/**
+ * Authentication page component that toggles between sign-in and sign-up forms.
+ * Manages the active form state and renders the appropriate form component.
+ *  { JSX.Element} The sign-in/sign-up page layout.
+ */
 export default function SignIn() {
+  // Tracks whether the sign-up form is shown (true) or the sign-in form (false)
   const [ isSignUp, setIsSignUp ] = useState(false)
 
   return (
     <div className="min-h-screen bg-gray-800 text-gray-100">
+      {/* Site header with contextual subtitle */}
       <header className="border-b border-gray-700 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
           <h1 className="text-xl font-bold tracking-tight text-white">Black Hole Basin</h1>
@@ -19,8 +26,10 @@ export default function SignIn() {
             { isSignUp ? 'Create Account' : 'Sign In' }
           </h2>
 
+          {/* Render the active form based on toggle state */}
           { isSignUp ? <SignUpForm/> : <SignInForm/> }
 
+          {/* Toggle link to switch between sign-in and sign-up */}
           <p className="mt-6 text-center text-sm text-gray-400">
             { isSignUp ? 'Already have an account?' : 'Don\'t have an account?' }{ ' ' }
             <button
@@ -38,9 +47,14 @@ export default function SignIn() {
 }
 
 
+/**
+ * Sign-in form component with email and password fields.
+ *  { JSX.Element} The sign-in form markup.
+ */
 function SignInForm() {
   return (
     <form className="flex flex-col gap-6">
+      {/* Email field */}
       <div className="flex flex-col gap-2">
         <label htmlFor="email" className="text-sm font-medium text-gray-400">
           Email
@@ -53,6 +67,7 @@ function SignInForm() {
         />
       </div>
 
+      {/* Password field */}
       <div className="flex flex-col gap-2">
         <label htmlFor="password" className="text-sm font-medium text-gray-400">
           Password
@@ -76,9 +91,14 @@ function SignInForm() {
 }
 
 
+/**
+ * Sign-up form component with name, email, password, and confirm password fields.
+ *  { JSX.Element} The sign-up form markup.
+ */
 function SignUpForm() {
   return (
     <form className="flex flex-col gap-6">
+      {/* Name field */}
       <div className="flex flex-col gap-2">
         <label htmlFor="name" className="text-sm font-medium text-gray-400">
           Name
@@ -91,6 +111,7 @@ function SignUpForm() {
         />
       </div>
 
+      {/* Email field */}
       <div className="flex flex-col gap-2">
         <label htmlFor="signup-email" className="text-sm font-medium text-gray-400">
           Email
@@ -103,6 +124,7 @@ function SignUpForm() {
         />
       </div>
 
+      {/* Password and confirm password fields side-by-side */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
           <label htmlFor="signup-password" className="text-sm font-medium text-gray-400">

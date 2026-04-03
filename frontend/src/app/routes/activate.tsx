@@ -2,16 +2,31 @@ import React, { useState } from 'react'
 import { useSearchParams } from 'react-router'
 
 
+/**
+ * Account activation page component.
+ * Reads the activation token from the URL query string and provides
+ * a button to submit it to the backend. Displays success, error,
+ * or invalid-link states based on the activation result.
+ *  { JSX.Element} The account activation page layout.
+ */
 export default function Activate() {
   const [searchParams] = useSearchParams()
+
+  // Extract the activation token from the ?token= query parameter
   const token = searchParams.get('token')
+
+  // Tracks the current activation flow state
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
 
+  /**
+   * Sends the activation token to the backend API to activate the user's account.
+   * Updates the component state based on the API response.
+   */
   async function handleActivate() {
     setStatus('loading')
     try {
-      const response = await fetch('http://localhost:4200/api/sign-up/activation', {
+      const response = await fetch('http://localhost:4200/api/auth/activation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ activation: token })
@@ -32,6 +47,7 @@ export default function Activate() {
 
   return (
     <div className="min-h-screen bg-gray-800 text-gray-100">
+      {/* Site header with page subtitle */}
       <header className="border-b border-gray-700 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
           <h1 className="text-xl font-bold tracking-tight text-white">Black Hole Basin</h1>
@@ -41,6 +57,7 @@ export default function Activate() {
 
       <main className="mx-auto max-w-md px-6 py-10">
         <div className="rounded-md bg-gray-700 p-6 shadow-lg text-center">
+          {/* Conditional rendering based on token presence and activation status */}
           {!token ? (
             <p className="text-gray-400">Invalid activation link. No token provided.</p>
           ) : status === 'success' ? (
