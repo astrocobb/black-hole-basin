@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useSearchParams } from 'react-router'
+import { apiClient } from '../../lib/api-client'
 
 
 /**
@@ -7,7 +8,7 @@ import { useSearchParams } from 'react-router'
  * Reads the activation token from the URL query string and provides
  * a button to submit it to the backend. Displays success, error,
  * or invalid-link states based on the activation result.
- *  { JSX.Element} The account activation page layout.
+ * @returns { JSX.Element } The account activation page layout.
  */
 export default function Activate() {
   const [searchParams] = useSearchParams()
@@ -26,9 +27,8 @@ export default function Activate() {
   async function handleActivate() {
     setStatus('loading')
     try {
-      const response = await fetch('http://localhost:4200/api/auth/activation', {
+      const response = await apiClient('/api/auth/activation', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ activation: token })
       })
       const data = await response.json()
@@ -50,7 +50,9 @@ export default function Activate() {
       {/* Site header with page subtitle */}
       <header className="border-b border-gray-700 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
-          <h1 className="text-xl font-bold tracking-tight text-white">Black Hole Basin</h1>
+          <a href="/" className="text-xl font-bold tracking-tight text-white hover:text-gray-300 transition">
+            Black Hole Basin
+          </a>
           <span className="text-sm text-gray-500">Account Activation</span>
         </div>
       </header>

@@ -50,7 +50,8 @@ export class App {
     // CORS must come first so preflight requests are handled before other middleware
     this.app.use(cors({
       origin: 'http://localhost:5173',
-      credentials: true // Required for session cookies to be sent cross-origin
+      credentials: true,                    // Required for session cookies to be sent cross-origin
+      exposedHeaders: ['authorization']      // Allow the browser to read the JWT from the response header
     }))
 
     // HTTP request logger for development

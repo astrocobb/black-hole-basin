@@ -1,19 +1,56 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router'
+import { useAuth } from '../../features/auth/hooks/use-auth'
 
 
 /**
  * Dashboard page component for the well depth calculator.
- * Provides coordinate input fields (latitude/longitude) and a calculate button.
- *  { JSX.Element} The dashboard page layout.
+ * Requires authentication — redirects to sign-in if the user is not logged in.
+ * Displays the user's name in the header and provides a sign-out action.
+ * @returns { JSX.Element } The dashboard page layout.
  */
 export default function Dashboard() {
+  const { user, isAuthenticated, signOut } = useAuth()
+  const navigate = useNavigate()
+
+  // Redirect unauthenticated users to the sign-in page
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/sign-in')
+    }
+  }, [isAuthenticated, navigate])
+
+  // Don't render dashboard content until auth state is confirmed
+  if (!isAuthenticated || !user) {
+    return null
+  }
+
+  /**
+   * Signs the user out and redirects to the home page.
+   */
+  function handleSignOut() {
+    signOut()
+    navigate('/')
+  }
+
   return (
     <div className="min-h-screen bg-gray-800 text-gray-100">
-      {/* Site header with page subtitle */}
+      {/* Site header with user info and sign-out */}
       <header className="border-b border-gray-700 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
-          <h1 className="text-xl font-bold tracking-tight text-white">Black Hole Basin</h1>
-          <span className="text-sm text-gray-500">Well Depth Calculator</span>
+          <a href="/" className="text-xl font-bold tracking-tight text-white hover:text-gray-300 transition">
+            Black Hole Basin
+          </a>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-400">{ user.name }</span>
+            <button
+              type="button"
+              onClick={ handleSignOut }
+              className="rounded-md border border-gray-600 px-3 py-1.5 text-sm text-gray-300 transition hover:bg-gray-700"
+            >
+              Sign Out
+            </button>
+          </div>
         </div>
       </header>
 
