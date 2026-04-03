@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 # Development
 npm run dev          # React Router SSR dev server (frontend on :5173)
-npm run dev:api      # Backend API only with tsx watch (on :4200)
+npm run dev:backend  # Backend API only with tsx watch (on :4200)
 
 # Build & Typecheck
 npm run build        # Build React Router SSR bundle

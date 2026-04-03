@@ -47,9 +47,9 @@ export class App {
    */
   private middlewares(): void {
 
-    // CORS must come first so preflight requests are handled before other middleware
+    // CORS must come first, so preflight requests are handled before other middleware
     this.app.use(cors({
-      origin: 'http://localhost:5173',
+      origin: process.env.FRONTEND_URL,
       credentials: true,                    // Required for session cookies to be sent cross-origin
       exposedHeaders: ['authorization']      // Allow the browser to read the JWT from the response header
     }))
@@ -94,10 +94,11 @@ export class App {
   }
 
   /**
-   * Starts the Express server on port 4200.
+   * Starts the Express server on the port defined by the PORT environment variable.
    */
   public listen(): void  {
-    this.app.listen(4200)
-    console.log('Express application built successfully!')
+    const port = process.env.PORT ?? 4200
+    this.app.listen(port)
+    console.log(`Express application listening on port ${ port }`)
   }
 }

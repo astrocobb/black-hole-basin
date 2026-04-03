@@ -135,7 +135,7 @@ export async function signUpController(request: Request, response: Response): Pr
       const resend = new Resend(process.env.RESEND_API_KEY as string)
 
       // Build the activation URL pointing to the frontend activation page
-      const activateUrl: string = `${ request.protocol }://${ request.hostname }:5173/activate?token=${ activationToken }`
+      const activateUrl: string = `${ process.env.FRONTEND_URL }/activate?token=${ activationToken }`
       const html = `
         <h2>Welcome to Black Hole Basin!</h2>
         <p>You must confirm your account.</p>

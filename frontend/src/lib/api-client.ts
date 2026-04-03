@@ -3,9 +3,6 @@
  * Wraps fetch with the base URL, JSON headers, credentials, and JWT authorization.
  */
 
-/** Base URL for all API requests. */
-const API_BASE = 'http://localhost:4200'
-
 /** localStorage key used to persist the JWT across page reloads. */
 export const AUTH_TOKEN_KEY = 'authorization'
 
@@ -33,7 +30,7 @@ export async function apiClient(path: string, options: RequestInit = {}): Promis
     headers['Authorization'] = token
   }
 
-  return fetch(`${ API_BASE }${ path }`, {
+  return fetch(`${ import.meta.env.VITE_REST_API_URL }${ path }`, {
     ...options,
     headers,
     credentials: 'include' // Required for session cookies

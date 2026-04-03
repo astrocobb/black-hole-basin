@@ -3,9 +3,9 @@ import type { Config } from '@react-router/dev/config'
 
 /**
  * React Router configuration.
- * Points the app directory to the frontend source and enables server-side rendering.
+ * Paths are relative to this file's location (frontend/).
  */
 export default {
-  appDirectory: 'frontend/src/app',
+  appDirectory: 'src/app',
   ssr: true
 } satisfies Config
