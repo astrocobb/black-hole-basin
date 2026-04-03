@@ -69,7 +69,7 @@ export async function postMonitoringWellController(request: Request, response: R
 
     response.status(201).json({
       status: 201,
-      data: null,
+      data: newMonitoringWell,
       message: 'Successfully created monitoring well.'
     })
 

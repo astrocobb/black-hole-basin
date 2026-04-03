@@ -10,7 +10,7 @@ export async function activationController(request: Request, response: Response)
 
     const validationResult = z.object({
       activation: z.string('Activation is required.').length(32, 'Please provide a valid activation token.')
-    }).safeParse(request.params)
+    }).safeParse(request.body)
 
     if (!validationResult.success) {
       zodErrorResponse(response, validationResult.error)

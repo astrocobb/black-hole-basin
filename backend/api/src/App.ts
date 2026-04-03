@@ -8,6 +8,7 @@ import { RedisStore } from 'connect-redis'
 import { signUpRoute } from './features/sign-up/sign-up.route'
 import { signInRoute } from './features/sign-in/sign-in.route'
 import { monitoringWell } from './features/monitoring-wells/monitoring-well.route'
+import { userRoute } from './features/users/user.route'
 
 
 // app class that extends the express application
@@ -69,6 +70,7 @@ export class App {
   private routes(): void {
     this.app.use(signUpRoute.basePath, signUpRoute.router)
     this.app.use(signInRoute.basePath, signInRoute.router)
+    this.app.use(userRoute.basePath, userRoute.router)
     this.app.use(monitoringWell.basePath, monitoringWell.router)
   }
 

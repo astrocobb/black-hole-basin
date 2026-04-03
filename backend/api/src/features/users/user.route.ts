@@ -3,10 +3,10 @@ import { isSignedInController } from '../../utils/controllers/is-signed-in.contr
 import { getUserByIdController } from './user.controller'
 
 
-const basePath = '/api/user' as const
+const basePath = '/api/users' as const
 const router = Router()
 
-router.route('/id/:id')
+router.route('/:id')
   .get(isSignedInController, getUserByIdController)
 
 export const userRoute = { basePath, router }

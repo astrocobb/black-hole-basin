@@ -3,7 +3,7 @@ import { postMonitoringWellController } from './monitoring-well.controller'
 import { isSignedInController } from '../../utils/controllers/is-signed-in.controller'
 
 
-const basePath = '/api/monitoringWell' as const
+const basePath = '/api/monitoring-wells' as const
 const router = Router()
 
 router.route('/')

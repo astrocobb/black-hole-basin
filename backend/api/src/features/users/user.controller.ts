@@ -28,9 +28,11 @@ export async function getUserByIdController(request: Request, response: Response
       return
     }
 
+    const { hash, activationToken, ...safeUser } = user
+
     response.status(200).json({
       status: 200,
-      data: user,
+      data: safeUser,
       message: 'Successfully retrieved user.'
     })
 

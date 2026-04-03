@@ -33,11 +33,11 @@ export async function signUpController(request: Request, response: Response) {
     let emailSent = false
     try {
       const resend = new Resend(process.env.RESEND_API_KEY as string)
-      const basePath: string = `${ request.protocol }://${ request.hostname }:8080${ request.originalUrl }/activation/${ activationToken }`
+      const activateUrl: string = `${ request.protocol }://${ request.hostname }:5173/activate?token=${ activationToken }`
       const html = `
         <h2>Welcome to Black Hole Basin!</h2>
         <p>You must confirm your account.</p>
-        <p><a href="${ basePath }">${ basePath }</a></p>`
+        <p><a href="${ activateUrl }">Activate your account</a></p>`
       const emailResult = await resend.emails.send({
         from: `Black Hole Basin <${ process.env.RESEND_FROM_EMAIL as string }>`,
         to: email,
@@ -53,10 +53,10 @@ export async function signUpController(request: Request, response: Response) {
 
     const status: Status = {
       status: 201,
+      data: null,
       message: emailSent
         ? 'Successfully signed up. Please check your email to activate your account.'
-        : 'Successfully signed up. Activation email could not be sent. Please contact support.',
-      data: null
+        : 'Successfully signed up. Activation email could not be sent. Please contact support.'
     }
 
     response.status(201).json(status)

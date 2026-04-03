@@ -26,8 +26,8 @@ export async function signInController(request: Request, response: Response): Pr
 
     const signInFailedStatus: Status = {
       status: 401,
-      message: 'Sign in failed. Email or password is incorrect.',
-      data: null
+      data: null,
+      message: 'Sign in failed. Email or password is incorrect.'
     }
 
     if (user === null) {
@@ -63,8 +63,8 @@ export async function signInController(request: Request, response: Response): Pr
 
     response.status(200).json({
       status: 200,
-      message: 'Successfully signed in.',
-      data: null
+      data: null,
+      message: 'Successfully signed in.'
     })
     return
 

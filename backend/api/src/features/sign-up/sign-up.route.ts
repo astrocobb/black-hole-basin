@@ -10,7 +10,7 @@ const router = Router()
 router.route('/')
   .post(signUpController)
 
-router.route('/activation/:activation')
-  .get(activationController)
+router.route('/activation')
+  .post(activationController)
 
 export const signUpRoute = { basePath, router }
