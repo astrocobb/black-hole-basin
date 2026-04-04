@@ -14,7 +14,7 @@ export const UserSchema = z.object({
   name: z.string('Please provide a valid name.')
     .min(1, 'Name must be at least 1 character.')
     .max(64, 'Name must be less than 64 characters.'),
-  role: z.enum(['admin', 'user']).default('user')
+  role: z.enum([ 'admin', 'user' ]).default('user')
 })
 
 /** TypeScript type inferred from the UserSchema. */

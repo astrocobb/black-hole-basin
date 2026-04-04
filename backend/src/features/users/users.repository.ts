@@ -14,7 +14,7 @@ export async function insertUser(user: User): Promise<string> {
 
   const { id, email, hash, name, role } = user
 
-  await sql `
+  await sql`
     INSERT INTO users (
       id,
       email,
@@ -42,14 +42,16 @@ export async function updateUser(user: User): Promise<string> {
 
   const { id, email, hash, name, role } = user
 
-  await sql `
+  await sql`
     UPDATE users
-    SET 
-      email = ${ email },
-      hash = ${ hash },
-      name = ${ name },
-      role = ${ role }
-    WHERE id = ${ id }
+    SET
+      email      = ${ email },
+      hash       = ${ hash },
+      name       = ${ name },
+      role       = ${ role },
+      updated_at = now()
+    WHERE
+      id = ${ id }
   `
   return 'User successfully updated!'
 }
@@ -61,15 +63,17 @@ export async function updateUser(user: User): Promise<string> {
  */
 export async function selectUserById(id: string): Promise<User | null> {
 
-  const rowList = await sql `
+  const rowList = await sql`
     SELECT
       id,
       email,
       hash,
       name,
       role
-    FROM users
-    WHERE id = ${ id }
+    FROM
+      users
+    WHERE
+      id = ${ id }
   `
 
   // Parse and validate the query result, expecting at most one row
@@ -86,15 +90,17 @@ export async function selectUserById(id: string): Promise<User | null> {
  */
 export async function selectUserByEmail(email: string): Promise<User | null> {
 
-  const rowList = await sql `
+  const rowList = await sql`
     SELECT
       id,
       email,
       hash,
       name,
       role
-    FROM users
-    WHERE email = ${ email }
+    FROM
+      users
+    WHERE
+      email = ${ email }
   `
 
   const result = UserSchema.array().max(1).parse(rowList)

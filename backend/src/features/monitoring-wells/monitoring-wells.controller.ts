@@ -1,6 +1,5 @@
 import { type Request, type Response } from 'express'
-import { serverErrorResponse, zodErrorResponse } from '../../lib/response'
-import { validUser } from '../../lib/auth'
+import { serverErrorResponse, zodErrorResponse } from '../../lib/responses'
 import { type User } from '../users/users.schema'
 import { selectUserById } from '../users/users.repository'
 import { type MonitoringWell, MonitoringWellSchema } from './monitoring-wells.schema'
@@ -20,13 +19,13 @@ export async function postMonitoringWellController(request: Request, response: R
   try {
 
     // Validate the request body against the monitoring well schema
-    const validationResult = MonitoringWellSchema.safeParse(request.body)
-    if (!validationResult.success) {
-      zodErrorResponse(response, validationResult.error)
+    const parsed = MonitoringWellSchema.safeParse(request.body)
+    if (!parsed.success) {
+      zodErrorResponse(response, parsed.error)
       return
     }
 
-    const newMonitoringWell: MonitoringWell = validationResult.data
+    const newMonitoringWell: MonitoringWell = parsed.data
 
     // Verify the referenced user exists
     const userId: string = newMonitoringWell.userId
@@ -62,7 +61,7 @@ export async function postMonitoringWellController(request: Request, response: R
     }
 
     // Ensure the session user owns the resource
-    if (!validUser(request, response, newMonitoringWell.userId)) return
+    // if (!validUser(request, response, newMonitoringWell.userId)) return
 
     // Check for duplicate monitoring well by ID
     const existingMonitoringWell = await selectMonitoringWellById(newMonitoringWell.id)

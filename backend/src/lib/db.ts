@@ -1,16 +1,17 @@
 import postgres from 'postgres'
+import { config } from '../config'
 
 
 /**
- * Shared PostgreSQL client configured from environment variables.
+ * Shared PostgreSQL client configured from config
  * Applies automatic camelCase transformation so database column names
  * (snake_case) map to JavaScript property names (camelCase) transparently.
  */
 export const sql = postgres({
-  user: process.env.POSTGRES_USER,
-  host: process.env.POSTGRES_HOST,
-  database: process.env.POSTGRES_DB,
-  password: process.env.POSTGRES_PASSWORD,
+  user: config.postgres.user,
+  host: config.postgres.host,
+  database: config.postgres.database,
+  password: config.postgres.password,
   transform: {
     column: {
       from: postgres.toCamel, // snake_case DB columns -> camelCase JS properties

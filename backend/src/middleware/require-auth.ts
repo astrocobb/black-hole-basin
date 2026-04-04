@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import type { Status } from '../types/Status'
-import { serverErrorResponse } from '../lib/response'
+import { serverErrorResponse } from '../lib/responses'
 import type { User } from '../features/users/users.schema'
 import pkg from 'jsonwebtoken'
 const { verify } = pkg

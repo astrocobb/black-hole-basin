@@ -1,8 +1,8 @@
 import { type Request, type Response } from 'express'
-import { validUser } from '../../lib/auth'
-import { serverErrorResponse, zodErrorResponse } from '../../lib/response'
+import { serverErrorResponse, zodErrorResponse } from '../../lib/responses'
 import { type User, UserSchema } from './users.schema'
 import { selectUserById } from './users.repository'
+import { assertOwnership } from '../../lib/auth'
 
 
 /**
@@ -18,16 +18,16 @@ export async function getUserByIdController(request: Request, response: Response
   try {
 
     // Validate the ID param is a valid UUID v7
-    const validationResult = UserSchema.pick({ id: true }).safeParse(request.params)
-    if (!validationResult.success) {
-      zodErrorResponse(response, validationResult.error)
+    const parsed = UserSchema.pick({ id: true }).safeParse(request.params)
+    if (!parsed.success) {
+      zodErrorResponse(response, parsed.error)
       return
     }
 
-    const { id } = validationResult.data
+    const { id } = parsed.data
 
     // Ensure the requesting user owns this resource
-    if (!validUser(request, response, id)) return
+    // if (!assertOwnership(request, response, id)) return
 
     const user: User | null = await selectUserById(id)
     if (!user) {

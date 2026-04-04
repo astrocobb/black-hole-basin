@@ -2,6 +2,7 @@ import * as argon2 from 'argon2'
 import * as crypto from 'crypto'
 import { type Request, type Response } from 'express'
 import pkg from 'jsonwebtoken'
+import { ForbiddenError } from './errors'
 const { sign } = pkg
 
 
@@ -64,34 +65,14 @@ export async function validPassword(hash: string, password: string): Promise<boo
 }
 
 /**
- * Validates that the session user matches the resource owner.
- * Sends a 403 response and returns false if the check fails.
- * @param { Request } request - The Express request with session data.
- * @param { Response } response - The Express response for sending errors.
- * @param { string | undefined } userId - The resource owner's user ID to validate.
- * @returns { boolean } True if the session user owns the resource.
+ * Asserts that the user making the request owns the resource.
+ * @param { string | undefined } sessionUserId - The user ID from the session.
+ * @param { string } resourceUserId - The user ID of the resource to check.
+ * @throws { ForbiddenError } If the user IDs do not match.
+ * @returns { void }
  */
-export function validUser(request: Request, response: Response, userId: string | undefined): boolean {
-
-  // Reject if no user ID was provided
-  if (!userId) {
-    response.status(403).json({
-      status: 403,
-      data: null,
-      message: 'Forbidden: You do not have access to this resource.'
-    })
-    return false
+export function assertOwnership(sessionUserId: string | undefined, resourceUserId: string): void {
+  if (!sessionUserId || sessionUserId !== resourceUserId) {
+    throw new ForbiddenError('You are not authorized to access this resource.')
   }
-
-  // Reject if the session user does not match the resource owner
-  if (userId !== request.session?.user?.id) {
-    response.status(403).json({
-      status: 403,
-      data: null,
-      message: 'Forbidden: You do not own this resource.'
-    })
-    return false
-  }
-
-  return true
 }
