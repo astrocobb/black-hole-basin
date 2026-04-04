@@ -12,24 +12,52 @@ export async function insertMonitoringWell(monitoringWell: MonitoringWell): Prom
 
   MonitoringWellSchema.parse(monitoringWell)
 
-  const { id, userId, dateMeasured, depthToWater, siteNo, waterLevel } = monitoringWell
+  const {
+    id,
+    userId,
+    locationId,
+    locationName,
+    geom,
+    stateCode,
+    countyCode,
+    altitude,
+    holeDepth,
+    wellDepth,
+    dateDrilled,
+    createdAt,
+    updatedAt
+  } = monitoringWell
 
-  await sql `
-    INSERT INTO monitoring_wells (
+  await sql`
+    INSERT into monitoring_wells (
       id,
       user_id,
-      date_measured,
-      depth_to_water,
-      site_no,
-      water_level
+      location_id,
+      location_name,
+      geom,
+      state_code,
+      county_code,
+      altitude,
+      hole_depth,
+      well_depth,
+      date_drilled,
+      created_at,
+      updated_at
     )
-    VALUES (
+    values (
       ${ id },
       ${ userId },
-      ${ dateMeasured },
-      ${ depthToWater },
-      ${ siteNo },
-      ${ waterLevel }
+      ${ locationId },
+      ${ locationName },
+      ST_GeomFromGeoJSON(${ JSON.stringify(geom) }),
+      ${ stateCode },
+      ${ countyCode },
+      ${ altitude },
+      ${ holeDepth },
+      ${ wellDepth },
+      ${ dateDrilled },
+      ${ createdAt },
+      ${ updatedAt }
     )
   `
 
@@ -43,16 +71,25 @@ export async function insertMonitoringWell(monitoringWell: MonitoringWell): Prom
  */
 export async function selectMonitoringWellById(id: string): Promise<MonitoringWell | null> {
 
-  const rowList = await sql `
+  const rowList = await sql`
     SELECT
       id,
       user_id,
-      date_measured,
-      depth_to_water,
-      site_no,
-      water_level
-    FROM monitoring_wells
-    WHERE id = ${ id }
+      location_id,
+      location_name,
+      geom,
+      state_code,
+      county_code,
+      altitude,
+      hole_depth,
+      well_depth,
+      date_drilled,
+      created_at,
+      updated_at
+    FROM
+      monitoring_wells
+    WHERE
+      id = ${ id }
   `
 
   // Parse and validate the query result, expecting at most one row

@@ -1,12 +1,16 @@
 {
   "name": "black-hole-basin",
+  "author": "Trevor Herrera trevorherrera8710@gmail.com",
+  "version": "1.0.0",
+  "description": "An app that calculates and estimates depths and prices of water wells.",
+  "main": "index.ts",
   "private": true,
   "workspaces": [
     "frontend",
-    "backend/api"
+    "backend"
   ],
   "scripts": {
-    "dev:backend": "npm run dev --prefix backend/api",
+    "dev:backend": "npm run dev --prefix backend",
     "dev:frontend": "npm run dev --prefix frontend",
     "build": "npm run build --prefix frontend",
     "start": "npm run start --prefix frontend"
@@ -16,5 +20,8 @@
     "eslint": "^9.9.0",
     "prettier": "^3.3.3",
     "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": "24.13.1"
   }
 }

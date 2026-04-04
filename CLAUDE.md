@@ -79,8 +79,47 @@ React Router 7 with SSR enabled. Tailwind CSS 4 via Vite plugin. Dark theme (gra
 ## TODO
 
 - [x] Fix activation flow — `auth.repository.ts` `selectUserActivationByToken` return type doesn't match `User | null`, activation endpoint is broken
-- [ ] Update `monitoring-wells.schema.ts` to match SQL columns (`locationId`, `locationName`, `stateCode`, `countyCode`, `altitude`, `holeDepth`, `wellDepth`, `dateDrilled`)
-- [ ] Update `monitoring-wells.repository.ts` queries to use real SQL columns including PostGIS `geom`
-- [ ] Create `monitoring-well-data` feature (schema, repository, controller, route) for time-series readings (`depthToWater`, `dateMeasured`)
+- [x] Update `monitoring-wells.schema.ts` to match SQL columns (`locationId`, `locationName`, `stateCode`, `countyCode`, `altitude`, `holeDepth`, `wellDepth`, `dateDrilled`)
+- [x] Update `monitoring-wells.repository.ts` queries to use real SQL columns including PostGIS `geom`
+- [] Create `monitoring-well-data` feature (schema, repository, controller, route) for time-series readings (`depthToWater`, `dateMeasured`)
 - [ ] Update `updateUser` in `users.repository.ts` to set `updated_at = now()`
 - [ ] Remove commented-out `selectUserByActivationToken` from `users.repository.ts`
+
+## Restructuring Plan: 3-Layer Architecture
+
+Add a service layer and centralized config to align with standard Express/Node.js architecture guides (controller -> service -> repository).
+
+### New files to create
+- `backend/src/lib/errors.ts` — `AppError` base class + `NotFoundError`, `UnauthorizedError`, `ForbiddenError`, `ConflictError` subclasses with HTTP status codes
+- `backend/src/config/index.ts` — centralize all `process.env` reads into one validated `config` object (port, frontendUrl, session, redis, postgres, resend)
+- `backend/src/lib/redis.ts` — extract Redis client creation from `index.ts` into `createRedisClient()`
+- `backend/src/features/auth/auth.service.ts` — `signIn(email, password)`, `signUp(data)`, `activateAccount(token)`
+- `backend/src/features/users/users.service.ts` — `getUserById(id)` with hash stripping
+- `backend/src/features/monitoring-wells/monitoring-wells.service.ts` — `createMonitoringWell(data, sessionUser)` with admin/ownership/duplicate checks
+
+### Files to modify
+- `backend/src/features/auth/auth.controller.ts` — slim to: validate request -> call service -> send response
+- `backend/src/features/users/users.controller.ts` — same pattern
+- `backend/src/features/monitoring-wells/monitoring-wells.controller.ts` — same pattern
+- `backend/src/lib/auth.ts` — replace `validUser(req, res, id)` with `assertOwnership(sessionUserId, resourceUserId)` that throws `ForbiddenError` (removes Express coupling)
+- `backend/src/lib/db.ts` — use `config` import instead of `process.env`
+- `backend/src/App.ts` — use `config` import instead of `process.env`
+- `backend/src/index.ts` — use `config` + `createRedisClient()`, simplify bootstrap
+
+### Implementation order
+1. `lib/errors.ts`, `config/index.ts`, `lib/redis.ts` (no interdependencies)
+2. `lib/auth.ts` refactor, `lib/db.ts` update
+3. Three service files (auth, users, monitoring-wells)
+4. Three controller refactors
+5. `App.ts`, `index.ts` updates
+6. Update `CLAUDE.md` paths and feature structure docs
+
+### Target feature structure
+```
+features/<name>/
+  <name>.route.ts        # Express Router with basePath
+  <name>.controller.ts   # Validate request, call service, send response
+  <name>.service.ts      # Business logic, throws AppError on failure
+  <name>.repository.ts   # SQL queries (postgres lib)
+  <name>.schema.ts       # Zod schema + TypeScript type
+```
