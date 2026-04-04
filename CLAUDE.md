@@ -78,7 +78,7 @@ React Router 7 with SSR enabled. Tailwind CSS 4 via Vite plugin. Dark theme (gra
 
 ## TODO
 
-- [ ] Fix activation flow — `auth.repository.ts` `selectUserActivationByToken` return type doesn't match `User | null`, activation endpoint is broken
+- [x] Fix activation flow — `auth.repository.ts` `selectUserActivationByToken` return type doesn't match `User | null`, activation endpoint is broken
 - [ ] Update `monitoring-wells.schema.ts` to match SQL columns (`locationId`, `locationName`, `stateCode`, `countyCode`, `altitude`, `holeDepth`, `wellDepth`, `dateDrilled`)
 - [ ] Update `monitoring-wells.repository.ts` queries to use real SQL columns including PostGIS `geom`
 - [ ] Create `monitoring-well-data` feature (schema, repository, controller, route) for time-series readings (`depthToWater`, `dateMeasured`)

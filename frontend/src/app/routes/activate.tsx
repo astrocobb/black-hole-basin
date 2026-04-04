@@ -29,7 +29,7 @@ export default function Activate() {
     try {
       const response = await apiClient('/api/auth/activation', {
         method: 'POST',
-        body: JSON.stringify({ activation: token })
+        body: JSON.stringify({ token })
       })
       const data = await response.json()
       if (response.ok) {

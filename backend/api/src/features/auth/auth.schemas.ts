@@ -26,8 +26,8 @@ export const UserActivationSchema = z.object({
   userId: z.string('Please provide a valid token.'),
   token: z.string('Please provide a valid token.')
     .length(32, 'Token must be 32 characters.'),
-  expiresAt: z.iso.datetime({ offset: true }),
-  createdAt: z.iso.datetime({ offset: true })
+  expiresAt: z.coerce.date(),
+  createdAt: z.coerce.date()
 })
 
 export type UserActivation = z.infer<typeof UserActivationSchema>

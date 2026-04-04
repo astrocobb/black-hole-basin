@@ -28,7 +28,8 @@ export async function selectUserActivationByToken(token: string): Promise<UserAc
     SELECT
       user_id,
       token,
-      expires_at
+      expires_at,
+      created_at
     FROM user_activations
     WHERE token = ${ token } AND expires_at > now()
   `

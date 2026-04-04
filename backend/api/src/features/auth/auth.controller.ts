@@ -15,7 +15,7 @@ import { deleteUserActivation, insertUserActivation, selectUserActivationByToken
  * Handles user sign-in by validating credentials, verifying the password,
  * generating a JWT, and establishing a session.
  * @param { Request } request - Express request containing { email, password } in the body.
- * @param { Response } response - Express response for sending auth result or errors.
+ * @param { Response } response - Express response for sending an auth result or errors.
  * @returns { Promise<void> } Responds with 200 on success, 401 on invalid credentials.
  */
 export async function signInController(request: Request, response: Response): Promise<void> {
@@ -94,7 +94,7 @@ export async function signInController(request: Request, response: Response): Pr
 }
 
 /**
- * Handles new user registration by validating input, hashing the password,
+ * Handles a new user registration by validating input, hashing the password,
  * creating the user record, and sending an activation email via Resend.
  * @param { Request } request - Express request containing sign-up fields in the body.
  * @param { Response } response - Express response for sending the registration result.
