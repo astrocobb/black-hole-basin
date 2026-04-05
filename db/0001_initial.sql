@@ -64,7 +64,7 @@
 
 -- Drop tables in reverse dependency order so foreign keys don't complain.
 -- (You can only drop a table if nothing else points to it.)
-DROP TABLE IF EXISTS monitoring_well_data;
+DROP TABLE IF EXISTS well_data;
 DROP TABLE IF EXISTS monitoring_wells;
 DROP TABLE IF EXISTS user_activations;
 DROP TABLE IF EXISTS users;
@@ -179,7 +179,7 @@ CREATE INDEX idx_monitoring_wells_geom ON monitoring_wells USING GIST (geom);
 
 
 -- ============================================================================
--- MONITORING WELL DATA (time-series water level readings)
+-- WELL DATA (time-series water level readings)
 -- ============================================================================
 -- Each row is a single water-level measurement for a well at a point in time.
 -- A well might have thousands of these — one per day/week/month going back
@@ -188,7 +188,7 @@ CREATE INDEX idx_monitoring_wells_geom ON monitoring_wells USING GIST (geom);
 -- ON DELETE CASCADE: if a well record is deleted, all its readings go too.
 -- (You'd never want orphaned readings pointing at a well that doesn't exist.)
 
-CREATE TABLE IF NOT EXISTS monitoring_well_data
+CREATE TABLE IF NOT EXISTS well_data
 (
   id                 UUID PRIMARY KEY,
   monitoring_well_id UUID        NOT NULL REFERENCES monitoring_wells (id) ON DELETE CASCADE,
@@ -198,14 +198,14 @@ CREATE TABLE IF NOT EXISTS monitoring_well_data
 );
 
 -- Speed up "show me all readings for this well" queries.
-CREATE INDEX idx_well_data_well_id ON monitoring_well_data (monitoring_well_id);
+CREATE INDEX idx_well_data_well_id ON well_data (monitoring_well_id);
 
 -- Speed up "show me all readings across all wells on this date" queries.
-CREATE INDEX idx_well_data_date_measured ON monitoring_well_data (date_measured);
+CREATE INDEX idx_well_data_date_measured ON well_data (date_measured);
 
 -- COMPOSITE INDEX: covers the most common query pattern — "get all readings
 -- for well X, sorted by date." Postgres can satisfy this entirely from the
 -- index without touching the actual table rows, which is significantly faster.
 -- Think of it as a textbook index sorted first by well, then by date within
 -- each well's section.
-CREATE INDEX idx_well_data_well_date ON monitoring_well_data (monitoring_well_id, date_measured);
+CREATE INDEX idx_well_data_well_date ON well_data (monitoring_well_id, date_measured);
