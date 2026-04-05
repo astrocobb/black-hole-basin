@@ -64,6 +64,8 @@
 
 -- Drop tables in reverse dependency order so foreign keys don't complain.
 -- (You can only drop a table if nothing else points to it.)
+DROP TABLE IF EXISTS estimates;
+DROP TABLE IF EXISTS user_configs;
 DROP TABLE IF EXISTS well_data;
 DROP TABLE IF EXISTS monitoring_wells;
 DROP TABLE IF EXISTS user_activations;
@@ -209,3 +211,79 @@ CREATE INDEX idx_well_data_date_measured ON well_data (date_measured);
 -- Think of it as a textbook index sorted first by well, then by date within
 -- each well's section.
 CREATE INDEX idx_well_data_well_date ON well_data (monitoring_well_id, date_measured);
+
+
+-- ============================================================================
+-- USER CONFIGS (pricing and specification defaults for estimates)
+-- ============================================================================
+-- Each row is a named configuration that a user can create and reuse across
+-- multiple estimates. A user might have "Residential Standard", "Commercial
+-- Deep Well", etc. with different pricing and specs for each.
+--
+-- ON DELETE CASCADE: if the user is deleted, their configs go too.
+-- casing_prices and screen_prices are JSONB objects keyed by diameter in
+-- inches, e.g. { "4": 12.50, "6": 18.75 }
+
+CREATE TABLE IF NOT EXISTS user_configs
+(
+  id               UUID PRIMARY KEY,
+  user_id          UUID    NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  name             TEXT    NOT NULL,                -- label like "Residential Standard"
+  cost_per_foot    NUMERIC NOT NULL,                -- drilling cost per foot
+  mobilization_fee NUMERIC NOT NULL DEFAULT 0,      -- flat fee for mobilizing equipment
+  casing_prices    JSONB   NOT NULL DEFAULT '{}',   -- diameter-to-price mapping
+  screen_prices    JSONB   NOT NULL DEFAULT '{}',   -- diameter-to-price mapping
+  slot_size        NUMERIC NOT NULL,                -- screen slot size
+  grain_size       NUMERIC NOT NULL,                -- gravel pack grain size
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Speed up "show me all configs for this user" queries.
+CREATE INDEX idx_user_configs_user_id ON user_configs (user_id);
+
+
+-- ============================================================================
+-- ESTIMATES (persisted well drilling estimates)
+-- ============================================================================
+-- Each row is a saved estimate combining user input (location, water demand),
+-- calculated results (depth, casing, screen), and cost breakdown. References
+-- the nearest monitoring well used for the calculation and the user config
+-- that provided pricing.
+--
+-- ON DELETE RESTRICT on user_config_id: don't allow deleting a config that
+-- has estimates referencing it — the user should reassign or delete the
+-- estimates first.
+
+CREATE TABLE IF NOT EXISTS estimates
+(
+  id                        UUID PRIMARY KEY,
+  user_id                   UUID    NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  user_config_id            UUID    NOT NULL REFERENCES user_configs (id) ON DELETE RESTRICT,
+  nearest_monitoring_well_id UUID   NOT NULL REFERENCES monitoring_wells (id) ON DELETE RESTRICT,
+
+  -- User input
+  input_lat                 NUMERIC NOT NULL,
+  input_lon                 NUMERIC NOT NULL,
+  water_demand_gpm          NUMERIC NOT NULL,
+
+  -- Calculated results
+  estimated_depth           NUMERIC NOT NULL,
+  altitude_difference       NUMERIC NOT NULL,
+  depth_to_water            NUMERIC NOT NULL,
+  casing_diameter           NUMERIC NOT NULL,  -- inches
+  screen_length             NUMERIC NOT NULL,  -- feet
+  slot_size                 NUMERIC NOT NULL,
+
+  -- Cost breakdown
+  drilling_cost             NUMERIC NOT NULL,
+  screen_cost               NUMERIC NOT NULL,
+  gravel_pack_cost          NUMERIC NOT NULL,
+  mobilization_cost         NUMERIC NOT NULL,
+  total_cost                NUMERIC NOT NULL,
+
+  created_at                TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Speed up "show me all estimates for this user" queries.
+CREATE INDEX idx_estimates_user_id ON estimates (user_id);

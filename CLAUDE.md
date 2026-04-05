@@ -94,9 +94,33 @@ React Router 7 with SSR enabled. Tailwind CSS 4 via Vite plugin. Dark theme (gra
 - Throws format: `@throws { ErrorClass } When condition`
 - Route comments: `/** METHOD /path - Description */` — HTTP verb in all caps, no `@` prefix
 
+## Estimates Feature
+
+`POST /api/estimates` — single endpoint that returns a full well drilling estimate.
+
+**Input**: lat/lon location, water demand (GPM), client config ID
+
+**Pipeline** (orchestrated by `estimates.service.ts`):
+1. Find nearest monitoring well to input location (PostGIS spatial query)
+2. Get that well's `wellDepth` and `altitude`
+3. Look up recent `depthToWater` from `well_data` for that well
+4. Compare altitudes between input location and monitoring well → estimated depth
+5. Calculate casing diameter from water demand (standard GPM-to-diameter rules)
+6. Calculate screen length from water demand and estimated depth
+7. Pull client config for pricing rates
+8. Calculate cost from depth × cost-per-foot, casing cost, screen cost, etc.
+
+**Output**: estimated depth, casing diameter, screen length, depth to water, altitude difference, cost breakdown, nearest monitoring well reference
+
+**Features**:
+- `estimates/` — route, controller, service, schema; repository for spatial queries
+- `client-configs/` — CRUD for pricing/config (cost per foot, casing prices, screen prices, mobilization fee)
+
 ## TODO
 
-- [ ] Create `monitoring-well-data` feature (schema, repository, controller, route) for time-series readings (`depthToWater`, `dateMeasured`)
+- [x] Create `well-data` feature (schema, repository, controller, route) for time-series readings (`depthToWater`, `dateMeasured`)
+- [ ] Create `estimates` feature (schema, service, controller, route) for well drilling estimates
+- [ ] Create `client-configs` feature (schema, repository, controller, route, service) for pricing configuration
 
 - [x] Fix activation flow — `auth.repository.ts` `selectUserActivationByToken` return type doesn't match `User | null`, activation endpoint is broken
 - [x] Update `monitoring-wells.schema.ts` to match SQL columns (`locationId`, `locationName`, `stateCode`, `countyCode`, `altitude`, `holeDepth`, `wellDepth`, `dateDrilled`)
