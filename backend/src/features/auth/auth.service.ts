@@ -1,6 +1,6 @@
 import type { SignIn, SignUp } from './auth.schemas'
 import { generateJWT, generateActivationToken, hashPassword, verifyPassword } from '../../lib/auth'
-import type { SafeUser, User } from '../users/users.schema'
+import type { User } from '../users/users.schema'
 import { insertUser, selectUserByEmail } from '../users/users.repository'
 import { deleteUserActivation, insertUserActivation, selectUserActivationByToken } from './auth.repository'
 import { resend } from '../../config/resend'
@@ -69,9 +69,9 @@ export async function activateUser(token: string): Promise<void> {
 /**
  * Service function to sign in a user.
  * @param { SignIn } data - The user credentials including email and password.
- * @returns { Promise<{ safeUser: SafeUser, authorization: string, signature: string }> } The signed-in user data and JWT.
+ * @returns { Promise<{ user: User, authorization: string, signature: string }> } The signed-in user data and JWT.
  */
-export async function signIn(data: SignIn): Promise<{ safeUser: SafeUser, authorization: string, signature: string }> {
+export async function signIn(data: SignIn): Promise<{ user: User, authorization: string, signature: string }> {
 
   const { email, password } = data
 
@@ -95,7 +95,5 @@ export async function signIn(data: SignIn): Promise<{ safeUser: SafeUser, author
     role: user.role
   }, signature)
 
-  const { hash: _, ...safeUser } = user
-
-  return { safeUser, authorization, signature }
+  return { user, authorization, signature }
 }

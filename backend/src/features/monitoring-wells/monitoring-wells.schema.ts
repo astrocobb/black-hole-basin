@@ -26,23 +26,28 @@ export const MonitoringWellSchema = z.object({
   countyName: z
     .string({ error: 'Please provide a valid county name.' }),
   altitude: z
+    .coerce
     .number({ error: 'Please provide a valid number for altitude.' }),
   holeDepth: z
+    .coerce
     .number({ error: 'Please provide a valid number for hole depth.' }),
   wellDepth: z
+    .coerce
     .number({ error: 'Please provide a valid number for well depth.' }),
   dateDrilled: z
-    .iso.datetime({
-      offset: true,
+    .coerce
+    .date({
       error: 'Please provide a valid ISO datetime for date drilled.'
     })
     .optional(),
   createdAt: z
-    .coerce.date({
+    .coerce
+    .date({
       error: 'Please provide a valid date for created at.'
     }),
   updatedAt: z
-    .coerce.date({
+    .coerce
+    .date({
       error: 'Please provide a valid date for updated at.'
     })
 })

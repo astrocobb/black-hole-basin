@@ -11,7 +11,7 @@ import {
  * Inserts a new monitoring well row into the database.
  * Validates the monitoring well object against MonitoringWellInputSchema before inserting.
  * @param { MonitoringWellInput } data - The monitoring well object to insert.
- * @returns { void }
+ * @returns { Promise<void> }
  */
 export async function insertMonitoringWell(data: MonitoringWellInput): Promise<void> {
 
@@ -74,7 +74,7 @@ export async function selectMonitoringWellById(id: string): Promise<MonitoringWe
       user_id,
       location_id,
       location_name,
-      geom,
+      ST_AsGeoJSON(geom)::json AS geom,
       state_code,
       county_name,
       altitude,
