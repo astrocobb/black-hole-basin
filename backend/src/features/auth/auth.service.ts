@@ -12,7 +12,7 @@ import { v7 as uuid } from 'uuid'
 /**
  * Service function to sign up a new user.
  * @param { SignUp } data - The user data including email, password, and name.
- * @returns { emailSent: boolean } - Indicates whether an activation email was sent.
+ * @returns { Promise<{ emailSent: boolean }> } Indicates whether an activation email was sent.
  */
 export async function signUp(data: SignUp): Promise<{ emailSent: boolean }> {
 
@@ -53,7 +53,7 @@ export async function signUp(data: SignUp): Promise<{ emailSent: boolean }> {
 /**
  * Service function to activate a user account.
  * @param { string } token - The activation token.
- * @returns void
+ * @returns { Promise<void> }
  */
 export async function activateUser(token: string): Promise<void> {
 
@@ -69,7 +69,7 @@ export async function activateUser(token: string): Promise<void> {
 /**
  * Service function to sign in a user.
  * @param { SignIn } data - The user credentials including email and password.
- * @returns { safeUser: SafeUser, authorization: string, signature: string } - The signed-in user data and JWT.
+ * @returns { Promise<{ safeUser: SafeUser, authorization: string, signature: string }> } The signed-in user data and JWT.
  */
 export async function signIn(data: SignIn): Promise<{ safeUser: SafeUser, authorization: string, signature: string }> {
 

@@ -11,7 +11,7 @@ import {
  * Inserts a new monitoring well row into the database.
  * Validates the monitoring well object against MonitoringWellInputSchema before inserting.
  * @param { MonitoringWellInput } data - The monitoring well object to insert.
- * @returns void
+ * @returns { void }
  */
 export async function insertMonitoringWell(data: MonitoringWellInput): Promise<void> {
 

@@ -6,6 +6,7 @@ import { type UserActivation, UserActivationSchema } from './auth.schemas'
  * Inserts a new user activation record into the database.
  * @param { string } userId - The UUID of the user to activate.
  * @param { string } token - The activation token to store.
+ * @returns { Promise<void> }
  */
 export async function insertUserActivation(userId: string, token: string): Promise<void> {
   await sql`
@@ -22,6 +23,7 @@ export async function insertUserActivation(userId: string, token: string): Promi
 /**
  * Selects a user activation record by its token.
  * @param { string } token - The activation token to search for.
+ * @returns { Promise<UserActivation | null> } The matching activation record, or null if not found or expired.
  */
 export async function selectUserActivationByToken(token: string): Promise<UserActivation | null> {
   const rowList = await sql`
