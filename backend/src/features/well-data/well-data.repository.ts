@@ -15,7 +15,7 @@ export async function insertWellData(data: WellDataInput): Promise<void> {
   const { id, monitoringWellId, dateMeasured, depthToWater } = data
 
   await sql`
-    INSERT into public.monitoring_well_data (
+    INSERT into well_data (
       id,
       monitoring_well_id,
       date_measured,
@@ -45,7 +45,7 @@ export async function selectWellDataById(id: string): Promise<WellData | null> {
       depth_to_water,
       created_at
     FROM
-      monitoring_well_data
+      well_data
     WHERE
       id = ${ id }
   `
