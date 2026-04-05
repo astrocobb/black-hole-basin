@@ -7,8 +7,8 @@ import { type UserActivation, UserActivationSchema } from './auth.schemas'
  * @param { string } userId - The UUID of the user to activate.
  * @param { string } token - The activation token to store.
  */
-export async function insertUserActivation(userId: string, token: string) {
-  await sql `
+export async function insertUserActivation(userId: string, token: string): Promise<void> {
+  await sql`
     INSERT INTO user_activations (
       user_id,
       token                            
@@ -24,7 +24,7 @@ export async function insertUserActivation(userId: string, token: string) {
  * @param { string } token - The activation token to search for.
  */
 export async function selectUserActivationByToken(token: string): Promise<UserActivation | null> {
-  const rowList = await sql `
+  const rowList = await sql`
     SELECT
       user_id,
       token,
@@ -43,11 +43,11 @@ export async function selectUserActivationByToken(token: string): Promise<UserAc
 /**
  * Deletes a user activation record by its user ID.
  * @param { string } userId - The UUID of the user whose activation record to delete.
+ * @returns { Promise<void> } Resolves when the deletion is complete.
  */
-export async function deleteUserActivation(userId: string): Promise<string> {
-  await sql `
+export async function deleteUserActivation(userId: string): Promise<void> {
+  await sql`
     DELETE FROM user_activations
     WHERE user_id = ${ userId }
   `
-  return 'User activation record deleted.'
 }

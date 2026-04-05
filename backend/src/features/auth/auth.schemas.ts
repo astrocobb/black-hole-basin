@@ -3,8 +3,6 @@ import { z } from 'zod/v4'
 
 /**
  * Zod schema for validating sign-up request bodies.
- * Extends the base UserSchema by replacing `hash` and `activationToken`
- * (server-generated) with `password` and `passwordConfirm` (user-provided).
  * Includes a refinement to ensure both password fields match.
  */
 export const SignUpSchema = z
@@ -12,7 +10,6 @@ export const SignUpSchema = z
     id: z
       .uuidv7({ error: 'Please provide a valid uuid for id.' }),
     email: z
-      .string({ error: 'Please provide a valid email address.' })
       .email({ error: 'Please provide a valid email address.' })
       .max(128, { error: 'Email address must be less than 128 characters.' }),
     name: z
@@ -74,7 +71,6 @@ export type ActivationRequest = z.infer<typeof ActivationRequestSchema>
 export const SignInSchema = z
   .object({
     email: z
-      .string({ error: 'Please provide a valid email address.' })
       .email({ error: 'Please provide a valid email address.' })
       .max(128, { error: 'Email address must be less than 128 characters.' }),
     password: z

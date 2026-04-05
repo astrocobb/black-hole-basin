@@ -1,9 +1,11 @@
+/** Base class for all application errors. */
 export class AppError extends Error {
   constructor(public statusCode: number, message: string) {
     super(message)
   }
 }
 
+/** Custom error classes for specific HTTP status codes. */
 export class BadRequestError extends AppError {
   constructor(message: string) { super(400, message) }
 }

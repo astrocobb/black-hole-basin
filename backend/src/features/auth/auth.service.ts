@@ -1,9 +1,9 @@
 import type { SignIn, SignUp } from './auth.schemas'
-import { generateJwt, setActivationToken, setHash, validPassword } from '../../lib/auth'
-import type { User } from '../users/users.schema'
+import { generateJWT, generateActivationToken, hashPassword, verifyPassword } from '../../lib/auth'
+import type { SafeUser, User } from '../users/users.schema'
 import { insertUser, selectUserByEmail } from '../users/users.repository'
 import { deleteUserActivation, insertUserActivation, selectUserActivationByToken } from './auth.repository'
-import { Resend } from 'resend'
+import { resend } from '../../config/resend'
 import { config } from '../../config'
 import { BadRequestError, UnauthorizedError } from '../../lib/errors'
 import { v7 as uuid } from 'uuid'
@@ -18,18 +18,17 @@ export async function signUp(data: SignUp): Promise<{ emailSent: boolean }> {
 
   const { id, email, password, name, role } = data
 
-  const hash = await setHash(password)
+  const hash = await hashPassword(password)
 
   const user: User = { id, email, hash, name, role }
 
   await insertUser(user)
 
-  const activationToken = setActivationToken()
+  const activationToken = generateActivationToken()
   await insertUserActivation(user.id, activationToken)
 
   let emailSent = false
   try {
-    const resend = new Resend(config.resend.apiKey)
     const activateUrl = `${ config.frontendUrl }/activate?token=${ activationToken }`
     const html = `
         <h2>Welcome to Black Hole Basin!</h2>
@@ -54,7 +53,7 @@ export async function signUp(data: SignUp): Promise<{ emailSent: boolean }> {
 /**
  * Service function to activate a user account.
  * @param { string } token - The activation token.
- * @returns { void } - No return value.
+ * @returns void
  */
 export async function activateUser(token: string): Promise<void> {
 
@@ -70,9 +69,9 @@ export async function activateUser(token: string): Promise<void> {
 /**
  * Service function to sign in a user.
  * @param { SignIn } data - The user credentials including email and password.
- * @returns { user: User, authorization: string, signature: string } - The authenticated user and JWT.
+ * @returns { safeUser: SafeUser, authorization: string, signature: string } - The signed-in user data and JWT.
  */
-export async function signIn(data: SignIn): Promise<{ user: User, authorization: string, signature: string }> {
+export async function signIn(data: SignIn): Promise<{ safeUser: SafeUser, authorization: string, signature: string }> {
 
   const { email, password } = data
 
@@ -82,19 +81,21 @@ export async function signIn(data: SignIn): Promise<{ user: User, authorization:
     throw new UnauthorizedError('Sign in failed. Email or password is incorrect.')
   }
 
-  const isPasswordValid = await validPassword(user.hash, password)
+  const isPasswordValid = await verifyPassword(user.hash, password)
 
   if (!isPasswordValid) {
     throw new UnauthorizedError('Sign in failed. Email or password is incorrect.')
   }
 
   const signature = uuid()
-  const authorization = generateJwt({
+  const authorization = generateJWT({
     id: user.id,
     email: user.email,
     name: user.name,
     role: user.role
   }, signature)
 
-  return { user, authorization, signature }
+  const { hash: _, ...safeUser } = user
+
+  return { safeUser, authorization, signature }
 }

@@ -14,7 +14,7 @@ const basePath = '/api/users' as const
 /** Express router with user endpoint definitions. */
 const router = Router()
 
-// GET /api/users/:id - Retrieve a user by their ID (authenticated, owner-only)
+/** @GET /:id - Get a user by ID (authenticated) */
 router.route('/:id')
   .get(requireAuth, getUserByIdController)
 

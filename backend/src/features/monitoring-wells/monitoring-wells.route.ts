@@ -14,7 +14,7 @@ const basePath = '/api/monitoring-wells' as const
 /** Express router with monitoring well endpoint definitions. */
 const router = Router()
 
-// POST /api/monitoring-wells - Create a new monitoring well (authenticated, admin-only)
+/** @POST / - Create a new monitoring well (authenticated) */
 router.route('/')
   .post(requireAuth, postMonitoringWellController)
 

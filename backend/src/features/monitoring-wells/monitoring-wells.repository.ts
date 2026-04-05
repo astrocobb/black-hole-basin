@@ -10,12 +10,12 @@ import {
 /**
  * Inserts a new monitoring well row into the database.
  * Validates the monitoring well object against MonitoringWellInputSchema before inserting.
- * @param { MonitoringWell } monitoringWell - The monitoring well object to insert.
- * @returns { Promise<string> } A success confirmation message.
+ * @param { MonitoringWellInput } data - The monitoring well object to insert.
+ * @returns void
  */
-export async function insertMonitoringWell(monitoringWell: MonitoringWellInput): Promise<string> {
+export async function insertMonitoringWell(data: MonitoringWellInput): Promise<void> {
 
-  MonitoringWellInputSchema.parse(monitoringWell)
+  MonitoringWellInputSchema.parse(data)
 
   const {
     id,
@@ -29,7 +29,7 @@ export async function insertMonitoringWell(monitoringWell: MonitoringWellInput):
     holeDepth,
     wellDepth,
     dateDrilled
-  } = monitoringWell
+  } = data
 
   await sql`
     INSERT into monitoring_wells (
@@ -59,14 +59,12 @@ export async function insertMonitoringWell(monitoringWell: MonitoringWellInput):
       ${ dateDrilled ?? null }
     )
   `
-
-  return 'Monitoring Well successfully added to the database!'
 }
 
 /**
  * Selects a single monitoring well by its unique ID.
  * @param { string } id - The UUID v7 of the monitoring well to find.
- * @return { Promise<MonitoringWell | null> } The matching monitoring well, or null if not found.
+ * @returns { Promise<MonitoringWell | null> } The matching monitoring well, or null if not found.
  */
 export async function selectMonitoringWellById(id: string): Promise<MonitoringWell | null> {
 

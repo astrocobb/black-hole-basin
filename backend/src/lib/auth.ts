@@ -1,34 +1,18 @@
 import * as argon2 from 'argon2'
 import * as crypto from 'crypto'
-import { type Request, type Response } from 'express'
 import pkg from 'jsonwebtoken'
 import { ForbiddenError } from './errors'
 const { sign } = pkg
 
 
 /**
- * Generates a signed JWT with a 1-hour expiry containing the given payload.
+ * Generates a signed JWT with one hour expiry containing the given payload.
  * @param { object } payload - Data to embed in the JWT (e.g. user id, email, role).
  * @param { string } signature - Per-session secret used as the signing key.
  * @returns { string } The signed JWT string.
  */
-export function generateJwt(payload: object, signature: string): string {
-
-  /**
-   * Calculates the JWT expiration timestamp (1 hour from now).
-   * @param { number } currentTimestamp - Current time in milliseconds.
-   * @returns { number } Expiration time in seconds (Unix epoch).
-   */
-  const setExpire = (currentTimestamp: number): number => {
-    const oneHourInMilliseconds: number = 3600000
-    const futureTimestamp: number = Math.round(currentTimestamp) + oneHourInMilliseconds
-    const futureTimestampInSeconds: number = futureTimestamp / 1000
-    return Math.round(futureTimestampInSeconds)
-  }
-
-  const iat = new Date().getTime()
-  const exp = setExpire(iat)
-  return sign({ exp, auth: payload, iat }, signature)
+export function generateJWT(payload: object, signature: string): string {
+  return sign({ auth: payload }, signature, { expiresIn: '1h' })
 }
 
 /**
@@ -36,7 +20,7 @@ export function generateJwt(payload: object, signature: string): string {
  * @param { string } password - The plaintext password to hash.
  * @returns { Promise<string> } The resulting Argon2 hash string.
  */
-export async function setHash(password: string): Promise<string> {
+export async function hashPassword(password: string): Promise<string> {
   return await argon2.hash(
     password, {
       type: argon2.argon2id,
@@ -50,7 +34,7 @@ export async function setHash(password: string): Promise<string> {
  * Generates a cryptographically random 32-character hex activation token.
  * @returns { string } A 16-byte random value encoded as a hex string.
  */
-export function setActivationToken(): string {
+export function generateActivationToken(): string {
   return crypto.randomBytes(16).toString('hex')
 }
 
@@ -60,7 +44,7 @@ export function setActivationToken(): string {
  * @param { string } password - The plaintext password to check.
  * @returns { Promise<boolean> } True if the password matches the hash.
  */
-export async function validPassword(hash: string, password: string): Promise<boolean> {
+export async function verifyPassword(hash: string, password: string): Promise<boolean> {
   return await argon2.verify(hash, password)
 }
 

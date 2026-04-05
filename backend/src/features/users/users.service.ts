@@ -1,4 +1,4 @@
-import type { User } from './users.schema'
+import type { SafeUser } from './users.schema'
 import { selectUserById } from './users.repository'
 import { NotFoundError } from '../../lib/errors'
 import { assertOwnership } from '../../lib/auth'
@@ -7,10 +7,10 @@ import { assertOwnership } from '../../lib/auth'
 /**
  * User service function to retrieve a user by ID.
  * @param { string } id - The user ID to retrieve.
- * @param { sessionUserId } sessionUserId - The ID of the currently authenticated user.
- * @returns { user: User } The user object if found, or throws an error.
+ * @param { string | undefined } sessionUserId - The ID of the currently authenticated user.
+ * @returns { safeUser: SafeUser } The user object if found, or throws an error.
  */
-export async function getUserById(id: string, sessionUserId: string | undefined): Promise<Omit<User, 'hash'>> {
+export async function getUserById(id: string, sessionUserId: string | undefined): Promise<{ safeUser: SafeUser }> {
 
   const user = await selectUserById(id)
 
@@ -18,7 +18,7 @@ export async function getUserById(id: string, sessionUserId: string | undefined)
 
   assertOwnership(sessionUserId, user.id)
 
-  const { hash, ...safeUser } = user
+  const { hash: _, ...safeUser } = user
 
-  return safeUser
+  return { safeUser }
 }

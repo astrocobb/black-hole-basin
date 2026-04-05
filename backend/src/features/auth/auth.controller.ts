@@ -1,6 +1,5 @@
-import type { Request, Response } from 'express'
-import { serverErrorResponse, zodErrorResponse } from '../../lib/responses'
-import { AppError } from '../../lib/errors'
+import type { NextFunction, Request, Response } from 'express'
+import { zodErrorResponse } from '../../lib/responses'
 import { ActivationRequestSchema, SignInSchema, SignUpSchema } from './auth.schemas'
 import { activateUser, signIn, signUp } from './auth.service'
 
@@ -10,12 +9,12 @@ import { activateUser, signIn, signUp } from './auth.service'
  * creating the user record, and sending an activation email via Resend.
  * @param { Request } request - Express request containing sign-up fields in the body.
  * @param { Response } response - Express response for sending the registration result.
+ * @param { NextFunction } next - Express next function for error handling.
  * @returns { Promise<void> } Responds with 201 on success.
  */
-export async function signUpController(request: Request, response: Response): Promise<void> {
+export async function signUpController(request: Request, response: Response, next: NextFunction): Promise<void> {
   try {
 
-    // Validate sign-up fields including password confirmation match
     const parsed = SignUpSchema.safeParse(request.body)
     if (!parsed.success) {
       zodErrorResponse(response, parsed.error)
@@ -32,17 +31,8 @@ export async function signUpController(request: Request, response: Response): Pr
         : 'Sign up failed. Please try again.'
     })
 
-  } catch (error: any) {
-    console.error(error)
-    if (error instanceof AppError) {
-      response.status(error.statusCode).json({
-        status: error.statusCode,
-        data: null,
-        message: error.message
-      })
-      return
-    }
-    serverErrorResponse(response, error.message)
+  } catch (error) {
+    next(error)
   }
 }
 
@@ -51,13 +41,13 @@ export async function signUpController(request: Request, response: Response): Pr
  * looking up the user, and clearing their activation token to mark the account as active.
  * @param { Request } request - Express request containing { activation } token in the body.
  * @param { Response } response - Express response for sending the activation result.
+ * @param { NextFunction } next - Express next function for error handling.
  * @returns { Promise<void> } Responds with 200 on success.
  */
-export async function activationController(request: Request, response: Response): Promise<void> {
+export async function activationController(request: Request, response: Response, next: NextFunction): Promise<void> {
 
   try {
 
-    // Validate that the activation token is present and the correct length
     const parsed = ActivationRequestSchema.safeParse(request.body)
 
     if (!parsed.success) {
@@ -73,17 +63,8 @@ export async function activationController(request: Request, response: Response)
       message: 'Successfully activated account.'
     })
 
-  } catch (error: any) {
-    console.error(error)
-    if (error instanceof AppError) {
-      response.status(error.statusCode).json({
-        status: error.statusCode,
-        data: null,
-        message: error.message
-      })
-      return
-    }
-    serverErrorResponse(response, error.message)
+  } catch (error) {
+    next(error)
   }
 }
 
@@ -92,13 +73,13 @@ export async function activationController(request: Request, response: Response)
  * generating a JWT, and establishing a session.
  * @param { Request } request - Express request containing { email, password } in the body.
  * @param { Response } response - Express response for sending an auth result or errors.
+ * @param { NextFunction } next - Express next function for error handling.
  * @returns { Promise<void> } Responds with 200 on success.
  */
-export async function signInController(request: Request, response: Response): Promise<void> {
+export async function signInController(request: Request, response: Response, next: NextFunction): Promise<void> {
 
   try {
 
-    // Validate that email and password are present and well-formed
     const parsed = SignInSchema.safeParse(request.body)
 
     if (!parsed.success) {
@@ -109,7 +90,7 @@ export async function signInController(request: Request, response: Response): Pr
     const { user, authorization, signature } = await signIn(parsed.data)
 
     request.session.user = user
-    request.session.jwt = authorization
+    request.session.authorization = authorization
     request.session.signature = signature
 
     response.header({ authorization })
@@ -120,16 +101,7 @@ export async function signInController(request: Request, response: Response): Pr
       message: 'Successfully signed in.'
     })
 
-  } catch (error: any) {
-    console.error(error)
-    if (error instanceof AppError) {
-      response.status(error.statusCode).json({
-        status: error.statusCode,
-        data: null,
-        message: error.message
-      })
-      return
-    }
-    serverErrorResponse(response, error.message)
+  } catch (error) {
+    next(error)
   }
 }

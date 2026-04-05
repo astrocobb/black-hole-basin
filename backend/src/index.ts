@@ -12,7 +12,7 @@ declare module 'express-session' {
   /** Extended session data for storing auth state. */
   export interface SessionData {
     user: User | undefined
-    jwt: string | undefined
+    authorization: string | undefined
     signature: string | undefined
   }
 }

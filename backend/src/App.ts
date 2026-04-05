@@ -9,6 +9,7 @@ import { config } from './config'
 import { authRoute } from './features/auth/auth.route'
 import { usersRoute } from './features/users/users.route'
 import { monitoringWellsRoute } from './features/monitoring-wells/monitoring-wells.route'
+import { errorHandler } from './middleware/error-handler'
 
 
 /**
@@ -31,16 +32,10 @@ export class App {
     this.redisStore = new RedisStore({ client: redisClient })
     this.app = express()
     this.app.locals.redisClient = redisClient
-    this.settings()
     this.middlewares()
     this.routes()
+    this.app.use(errorHandler)
   }
-
-  /**
-   * Configures application-level settings such as the server port.
-   * Currently, a no-op placeholder for future configuration.
-   */
-  public settings(): void {}
 
   /**
    * Registers all middleware in the correct order:
@@ -65,12 +60,12 @@ export class App {
     this.app.use(session({
       store: this.redisStore,
       saveUninitialized: false,
-      secret: config.session.secret as string,
+      secret: config.session.secret,
       resave: false,
       cookie: {
         maxAge: 2 * 60 * 60 * 1000, // 2-hour session expiry
         httpOnly: true,              // Prevents client-side JavaScript access
-        secure: false,               // Set to true in production with HTTPS
+        secure: config.nodeEnv === 'production',
         sameSite: 'lax'              // CSRF protection
       }
     }))

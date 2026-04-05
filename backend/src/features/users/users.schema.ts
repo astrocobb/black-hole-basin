@@ -9,7 +9,6 @@ export const UserSchema = z.object({
   id: z
     .uuidv7({ error: 'Please provide a valid uuid for id.' }),
   email: z
-    .string({ error: 'Please provide a valid email address.' })
     .email({ error: 'Please provide a valid email address.' })
     .max(128, { error: 'Email address must be less than 128 characters.' }),
   hash: z
@@ -26,3 +25,6 @@ export const UserSchema = z.object({
 
 /** TypeScript type inferred from the UserSchema. */
 export type User = z.infer<typeof UserSchema>
+
+/** TypeScript type for a User without the hash field. */
+export type SafeUser = Omit<User, 'hash'>

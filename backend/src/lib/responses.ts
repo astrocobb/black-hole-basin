@@ -10,7 +10,7 @@ import type { ZodError } from 'zod/v4'
  * @param { string | null } message - Human-readable message describing the result.
  * @returns { Status } A formatted status object with { status, data, message }.
  */
-export function createStatus(status: number, data: unknown, message: string | null): Status {
+function createStatus(status: number, data: unknown, message: string | null): Status {
   return { status, data, message }
 }
 
@@ -24,10 +24,7 @@ export function createStatus(status: number, data: unknown, message: string | nu
 export function zodErrorResponse(response: Response, error: ZodError): Response<Status> {
 
   // Default message, overridden by the first validation issue if available
-  let message = 'validation error occurred'
-  if (error.issues[0]) {
-    message = error.issues[0].message
-  }
+  const message = error.issues[0]?.message ?? 'validation error occurred'
 
   return errorResponse(
     response,
@@ -53,15 +50,14 @@ export function errorResponse(response: Response, status: Status): Response<Stat
  * Sends a generic 500 internal server error response.
  * Used as a catch-all for unexpected errors in controller try/catch blocks.
  * @param { Response } response - The Express response object.
- * @param { unknown } defaultValue - Optional fallback data to include in the response (defaults to null).
  * @returns { Response<Status> } The 500 error response sent to the client.
  */
-export function serverErrorResponse(response: Response, defaultValue: unknown = null): Response<Status> {
+export function serverErrorResponse(response: Response): Response<Status> {
   return errorResponse(
     response,
     createStatus(
       500,
-      defaultValue,
+      null,
       'An internal server error occurred. Please try again.'
     )
   )

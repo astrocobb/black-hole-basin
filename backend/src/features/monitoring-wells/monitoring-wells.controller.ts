@@ -1,8 +1,7 @@
-import { type Request, type Response } from 'express'
-import { serverErrorResponse, zodErrorResponse } from '../../lib/responses'
+import type { NextFunction, Request, Response } from 'express'
+import { zodErrorResponse } from '../../lib/responses'
 import { MonitoringWellInputSchema } from './monitoring-wells.schema'
 import { postMonitoringWell } from './monitoring-wells.service'
-import { AppError } from '../../lib/errors'
 
 
 /**
@@ -11,13 +10,13 @@ import { AppError } from '../../lib/errors'
  * Checks for duplicate wells before inserting.
  * @param { Request } request - Express request containing monitoring well data in the body.
  * @param { Response } response - Express response for sending the result or errors.
+ * @param { NextFunction } next - Express next function for error handling.
  * @returns { Promise<void> } Responds with 201 on success, or 400/401/403/409 on failure.
  */
-export async function postMonitoringWellController(request: Request, response: Response): Promise<void> {
+export async function postMonitoringWellController(request: Request, response: Response, next: NextFunction): Promise<void> {
 
   try {
 
-    // Validate the request body against the monitoring well schema
     const parsed = MonitoringWellInputSchema.safeParse(request.body)
     if (!parsed.success) {
       zodErrorResponse(response, parsed.error)
@@ -34,16 +33,7 @@ export async function postMonitoringWellController(request: Request, response: R
       message: 'Successfully created monitoring well.'
     })
 
-  } catch (error: any) {
-    console.error(error)
-    if (error instanceof AppError) {
-      response.status(error.statusCode).json({
-        status: error.statusCode,
-        data: null,
-        message: error.message
-      })
-      return
-    }
-    serverErrorResponse(response, error.message)
+  } catch (error) {
+    next(error)
   }
 }
