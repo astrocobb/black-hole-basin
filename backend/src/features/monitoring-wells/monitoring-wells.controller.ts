@@ -1,9 +1,8 @@
 import { type Request, type Response } from 'express'
 import { serverErrorResponse, zodErrorResponse } from '../../lib/responses'
-import { type User } from '../users/users.schema'
-import { selectUserById } from '../users/users.repository'
-import { type MonitoringWell, MonitoringWellSchema } from './monitoring-wells.schema'
-import { insertMonitoringWell, selectMonitoringWellById } from './monitoring-wells.repository'
+import { MonitoringWellSchema } from './monitoring-wells.schema'
+import { postMonitoringWell } from './monitoring-wells.service'
+import { AppError } from '../../lib/errors'
 
 
 /**
@@ -25,66 +24,26 @@ export async function postMonitoringWellController(request: Request, response: R
       return
     }
 
-    const newMonitoringWell: MonitoringWell = parsed.data
-
-    // Verify the referenced user exists
-    const userId: string = newMonitoringWell.userId
-    const user: User | null = await selectUserById(userId)
-
-    if (!user) {
-      response.status(401).json({
-        status: 401,
-        data: null,
-        message: 'Create monitoring well failed. Please sign in.'
-      })
-      return
-    }
-
-    // Only admins are allowed to create monitoring wells
-    if (user.role !== 'admin') {
-      response.status(403).json({
-        status: 403,
-        data: null,
-        message: 'Create monitoring well failed. Admin role required.'
-      })
-      return
-    }
-
-    // Guard against missing request body (defensive check)
-    if (!newMonitoringWell) {
-      response.status(400).json({
-        status: 400,
-        data: null,
-        message: 'Create monitoring well failed. Request body is missing.'
-      })
-      return
-    }
-
-    // Ensure the session user owns the resource
-    // if (!validUser(request, response, newMonitoringWell.userId)) return
-
-    // Check for duplicate monitoring well by ID
-    const existingMonitoringWell = await selectMonitoringWellById(newMonitoringWell.id)
-
-    if (existingMonitoringWell) {
-      response.status(409).json({
-        status: 409,
-        data: null,
-        message: 'Create monitoring well failed. Monitoring well already exists.'
-      })
-      return
-    }
-
-    await insertMonitoringWell(newMonitoringWell)
+    const sessionUserId = request.session.user?.id
+    const data = parsed.data
+    await postMonitoringWell(data, sessionUserId)
 
     response.status(201).json({
       status: 201,
-      data: newMonitoringWell,
+      data: null,
       message: 'Successfully created monitoring well.'
     })
 
   } catch (error: any) {
     console.error(error)
+    if (error instanceof AppError) {
+      response.status(error.statusCode).json({
+        status: error.statusCode,
+        data: null,
+        message: error.message
+      })
+      return
+    }
     serverErrorResponse(response, error.message)
   }
 }

@@ -1,8 +1,8 @@
 import { type Request, type Response } from 'express'
 import { serverErrorResponse, zodErrorResponse } from '../../lib/responses'
-import { type User, UserSchema } from './users.schema'
-import { selectUserById } from './users.repository'
-import { assertOwnership } from '../../lib/auth'
+import { UserSchema } from './users.schema'
+import { getUserById } from './users.service'
+import { AppError } from '../../lib/errors'
 
 
 /**
@@ -24,32 +24,26 @@ export async function getUserByIdController(request: Request, response: Response
       return
     }
 
-    const { id } = parsed.data
-
-    // Ensure the requesting user owns this resource
-    // if (!assertOwnership(request, response, id)) return
-
-    const user: User | null = await selectUserById(id)
-    if (!user) {
-      response.status(404).json({
-        status: 404,
-        data: null,
-        message: 'Get user failed. User not found.'
-      })
-      return
-    }
-
-    // Strip sensitive fields before sending to the client
-    const { hash, ...safeUser } = user
+    const sessionUserId = request.session.user?.id
+    const userId = parsed.data.id
+    const user = await getUserById(userId, sessionUserId)
 
     response.status(200).json({
       status: 200,
-      data: safeUser,
+      data: user,
       message: 'Successfully retrieved user.'
     })
 
   } catch (error: any) {
     console.error(error)
+    if (error instanceof AppError) {
+      response.status(error.statusCode).json({
+        status: error.statusCode,
+        data: null,
+        message: error.message
+      })
+      return
+    }
     serverErrorResponse(response, error.message)
   }
 }

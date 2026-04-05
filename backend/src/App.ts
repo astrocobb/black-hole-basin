@@ -4,6 +4,7 @@ import session from 'express-session'
 import cors from 'cors'
 import type { RedisClientType } from 'redis'
 import { RedisStore } from 'connect-redis'
+import { config } from './config'
 // Route imports
 import { authRoute } from './features/auth/auth.route'
 import { usersRoute } from './features/users/users.route'
@@ -49,7 +50,7 @@ export class App {
 
     // CORS must come first, so preflight requests are handled before other middleware
     this.app.use(cors({
-      origin: process.env.FRONTEND_URL,
+      origin: config.frontendUrl,
       credentials: true,                    // Required for session cookies to be sent cross-origin
       exposedHeaders: ['authorization']      // Allow the browser to read the JWT from the response header
     }))
@@ -64,7 +65,7 @@ export class App {
     this.app.use(session({
       store: this.redisStore,
       saveUninitialized: false,
-      secret: process.env.SESSION_SECRET as string,
+      secret: config.session.secret as string,
       resave: false,
       cookie: {
         maxAge: 2 * 60 * 60 * 1000, // 2-hour session expiry
@@ -97,7 +98,7 @@ export class App {
    * Starts the Express server on the port defined by the PORT environment variable.
    */
   public listen(): void  {
-    const port = process.env.PORT ?? 4200
+    const port = config.port ?? 4200
     this.app.listen(port)
     console.log(`Express application listening on port ${ port }`)
   }

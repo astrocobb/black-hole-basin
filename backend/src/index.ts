@@ -1,6 +1,5 @@
-import 'dotenv/config'
 import { App } from './App'
-import { type RedisClientType, createClient } from 'redis'
+import { createRedisClient } from './lib/redis'
 import type { User } from './features/users/users.schema'
 
 
@@ -18,27 +17,14 @@ declare module 'express-session' {
   }
 }
 
-// Holds the singleton Redis client instance for the application lifetime
-let redisClient: RedisClientType | undefined
-
 /**
  * Bootstraps the application by connecting to Redis and starting the Express server.
  * @returns { Promise<void> } Resolves when the server is listening.
  */
 async function main(): Promise<void> {
-
-  // Create and connect the Redis client if one doesn't already exist
-  if (redisClient === undefined) {
-    redisClient = createClient({ socket: { host: process.env.REDIS_HOST } })
-    redisClient.connect().catch(console.error)
-  }
-
-  try {
-    const app = new App(redisClient)
-    app.listen()
-  } catch (error: any) {
-    console.error(error)
-  }
+  const redisClient = await createRedisClient()
+  const app = new App(redisClient)
+  app.listen()
 }
 
 main().catch(error => {
