@@ -1,11 +1,11 @@
-import type { MonitoringWell } from './monitoring-wells.schema'
+import type { MonitoringWellInput } from './monitoring-wells.schema'
 import { selectUserById } from '../users/users.repository'
 import { ConflictError, ForbiddenError, UnauthorizedError } from '../../lib/errors'
 import { assertOwnership } from '../../lib/auth'
 import { insertMonitoringWell, selectMonitoringWellById } from './monitoring-wells.repository'
 
 
-export async function postMonitoringWell(data: MonitoringWell, sessionUserId: string | undefined): Promise<void> {
+export async function postMonitoringWell(data: MonitoringWellInput, sessionUserId: string | undefined): Promise<void> {
 
   const newMonitoringWell = data
 

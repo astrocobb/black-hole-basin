@@ -153,12 +153,12 @@ CREATE TABLE IF NOT EXISTS monitoring_wells
   -- PostGIS geometry column: stores lat/lon as a single geographic point.
   -- 4326 = the SRID (spatial reference ID) for standard GPS coordinates
   -- (WGS 84 — the same system your phone uses).
-  -- To insert:  ST_SetSRID(ST_MakePoint(-106.65, 34.52), 4326)
-  -- To read:    ST_X(geom) -> longitude,  ST_Y(geom) -> latitude
+  -- To insert: ST_SetSRID(ST_MakePoint(-106.65, 34.52), 4326)
+  -- To read:   ST_X(geom) -> longitude,  ST_Y(geom) -> latitude
   geom          GEOMETRY(Point, 4326) NOT NULL,
 
   state_code    CHAR(2)               NOT NULL, -- FIPS code, e.g., "35" for New Mexico
-  county_code   CHAR(3),                        -- FIPS code, e.g., "061" for Valencia County
+  county_name   TEXT,                           -- county name, e.g., "Valencia County"
   altitude      NUMERIC,                        -- land surface elevation (ft above sea level)
   hole_depth    NUMERIC,                        -- total depth drilled (ft)
   well_depth    NUMERIC,                        -- completed/usable depth (ft), often shallower than hole_depth

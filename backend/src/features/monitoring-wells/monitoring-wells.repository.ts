@@ -1,16 +1,21 @@
 import { sql } from '../../lib/db'
-import { type MonitoringWell, MonitoringWellSchema } from './monitoring-wells.schema'
+import {
+  type MonitoringWell,
+  type MonitoringWellInput,
+  MonitoringWellSchema,
+  MonitoringWellInputSchema
+} from './monitoring-wells.schema'
 
 
 /**
  * Inserts a new monitoring well row into the database.
- * Validates the monitoring well object against MonitoringWellSchema before inserting.
+ * Validates the monitoring well object against MonitoringWellInputSchema before inserting.
  * @param { MonitoringWell } monitoringWell - The monitoring well object to insert.
  * @returns { Promise<string> } A success confirmation message.
  */
-export async function insertMonitoringWell(monitoringWell: MonitoringWell): Promise<string> {
+export async function insertMonitoringWell(monitoringWell: MonitoringWellInput): Promise<string> {
 
-  MonitoringWellSchema.parse(monitoringWell)
+  MonitoringWellInputSchema.parse(monitoringWell)
 
   const {
     id,
@@ -19,13 +24,11 @@ export async function insertMonitoringWell(monitoringWell: MonitoringWell): Prom
     locationName,
     geom,
     stateCode,
-    countyCode,
+    countyName,
     altitude,
     holeDepth,
     wellDepth,
-    dateDrilled,
-    createdAt,
-    updatedAt
+    dateDrilled
   } = monitoringWell
 
   await sql`
@@ -36,13 +39,11 @@ export async function insertMonitoringWell(monitoringWell: MonitoringWell): Prom
       location_name,
       geom,
       state_code,
-      county_code,
+      county_name,
       altitude,
       hole_depth,
       well_depth,
-      date_drilled,
-      created_at,
-      updated_at
+      date_drilled
     )
     values (
       ${ id },
@@ -51,13 +52,11 @@ export async function insertMonitoringWell(monitoringWell: MonitoringWell): Prom
       ${ locationName },
       ST_GeomFromGeoJSON(${ JSON.stringify(geom) }),
       ${ stateCode },
-      ${ countyCode },
+      ${ countyName },
       ${ altitude },
       ${ holeDepth },
       ${ wellDepth },
-      ${ dateDrilled },
-      ${ createdAt },
-      ${ updatedAt }
+      ${ dateDrilled ?? null }
     )
   `
 
@@ -66,8 +65,8 @@ export async function insertMonitoringWell(monitoringWell: MonitoringWell): Prom
 
 /**
  * Selects a single monitoring well by its unique ID.
- *  { string } id - The UUID v7 of the monitoring well to find.
- *  { Promise<MonitoringWell | null> } The matching monitoring well, or null if not found.
+ * @param { string } id - The UUID v7 of the monitoring well to find.
+ * @return { Promise<MonitoringWell | null> } The matching monitoring well, or null if not found.
  */
 export async function selectMonitoringWellById(id: string): Promise<MonitoringWell | null> {
 
@@ -79,7 +78,7 @@ export async function selectMonitoringWellById(id: string): Promise<MonitoringWe
       location_name,
       geom,
       state_code,
-      county_code,
+      county_name,
       altitude,
       hole_depth,
       well_depth,

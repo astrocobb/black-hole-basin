@@ -1,6 +1,6 @@
 import { type Request, type Response } from 'express'
 import { serverErrorResponse, zodErrorResponse } from '../../lib/responses'
-import { MonitoringWellSchema } from './monitoring-wells.schema'
+import { MonitoringWellInputSchema } from './monitoring-wells.schema'
 import { postMonitoringWell } from './monitoring-wells.service'
 import { AppError } from '../../lib/errors'
 
@@ -18,7 +18,7 @@ export async function postMonitoringWellController(request: Request, response: R
   try {
 
     // Validate the request body against the monitoring well schema
-    const parsed = MonitoringWellSchema.safeParse(request.body)
+    const parsed = MonitoringWellInputSchema.safeParse(request.body)
     if (!parsed.success) {
       zodErrorResponse(response, parsed.error)
       return
