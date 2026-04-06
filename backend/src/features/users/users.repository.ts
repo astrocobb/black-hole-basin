@@ -6,7 +6,7 @@ import { type User, UserSchema } from './users.schema'
  * Inserts a new user row into the database.
  * Validates the user object against UserSchema before inserting.
  * @param { User } user - The user object to insert.
- * @returns { Promise<void> }
+ * @returns { void }
  */
 export async function insertUser(user: User): Promise<void> {
 
@@ -35,7 +35,7 @@ export async function insertUser(user: User): Promise<void> {
 /**
  * Updates an existing user row in the database by ID.
  * @param { User } user - The user object with updated fields.
- * @returns { Promise<void> }
+ * @returns { void }
  */
 export async function updateUser(user: User): Promise<void> {
 

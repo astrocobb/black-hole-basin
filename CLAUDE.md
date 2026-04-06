@@ -92,7 +92,7 @@ React Router 7 with SSR enabled. Tailwind CSS 4 via Vite plugin. Dark theme (gra
 - Param format: `@param { Type } name - Description`
 - Returns format: `@returns { Type } Description` — always include `{ void }` for void-returning functions
 - Throws format: `@throws { ErrorClass } When condition`
-- Route comments: `/** METHOD /path - Description */` — HTTP verb in all caps, no `@` prefix
+- Route comments: `/** METHOD /path - Description */` — HTTP verb in all caps, with `@` prefix
 
 ## Estimates Feature
 

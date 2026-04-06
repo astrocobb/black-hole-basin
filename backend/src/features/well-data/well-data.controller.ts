@@ -9,7 +9,7 @@ import { postWellData } from './well-data.service'
  * @param { Request } request - Express request containing well data in the body.
  * @param { Response } response - Express response for sending the result or errors.
  * @param { NextFunction } next - Express next function for error handling.
- * @returns { Promise<void> } Responds with 201 on success, or 400/401/403 on failure.
+ * @returns { void } Responds with 201 on success, or 400/401/403 on failure.
  */
 export async function postWellDataController(request: Request, response: Response, next: NextFunction): Promise<void> {
   try {

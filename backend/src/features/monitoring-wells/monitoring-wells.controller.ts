@@ -11,10 +11,9 @@ import { postMonitoringWell } from './monitoring-wells.service'
  * @param { Request } request - Express request containing monitoring well data in the body.
  * @param { Response } response - Express response for sending the result or errors.
  * @param { NextFunction } next - Express next function for error handling.
- * @returns { Promise<void> } Responds with 201 on success, or 400/401/403/409 on failure.
+ * @returns { void } Responds with 201 on success, or 400/401/403/409 on failure.
  */
 export async function postMonitoringWellController(request: Request, response: Response, next: NextFunction): Promise<void> {
-
   try {
 
     const parsed = MonitoringWellInputSchema.safeParse(request.body)

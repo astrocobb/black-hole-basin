@@ -10,7 +10,7 @@ import { activateUser, signIn, signUp } from './auth.service'
  * @param { Request } request - Express request containing sign-up fields in the body.
  * @param { Response } response - Express response for sending the registration result.
  * @param { NextFunction } next - Express next function for error handling.
- * @returns { Promise<void> } Responds with 201 on success.
+ * @returns { void } Responds with 201 on success.
  */
 export async function signUpController(request: Request, response: Response, next: NextFunction): Promise<void> {
   try {
@@ -42,11 +42,10 @@ export async function signUpController(request: Request, response: Response, nex
  * @param { Request } request - Express request containing { activation } token in the body.
  * @param { Response } response - Express response for sending the activation result.
  * @param { NextFunction } next - Express next function for error handling.
- * @returns { Promise<void> } Responds with 200 on success.
+ * @returns { void } Responds with 200 on success.
  */
 export async function activationController(request: Request, response: Response, next: NextFunction): Promise<void> {
-
-  try {
+try {
 
     const parsed = ActivationRequestSchema.safeParse(request.body)
 
@@ -74,11 +73,10 @@ export async function activationController(request: Request, response: Response,
  * @param { Request } request - Express request containing { email, password } in the body.
  * @param { Response } response - Express response for sending an auth result or errors.
  * @param { NextFunction } next - Express next function for error handling.
- * @returns { Promise<void> } Responds with 200 on success.
+ * @returns { void } Responds with 200 on success.
  */
 export async function signInController(request: Request, response: Response, next: NextFunction): Promise<void> {
-
-  try {
+try {
 
     const parsed = SignInSchema.safeParse(request.body)
 

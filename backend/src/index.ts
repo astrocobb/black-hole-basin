@@ -19,7 +19,7 @@ declare module 'express-session' {
 
 /**
  * Bootstraps the application by connecting to Redis and starting the Express server.
- * @returns {Promise<void>} Resolves when the server is listening.
+ * @returns { void } Resolves when the server is listening.
  */
 async function main(): Promise<void> {
   const redisClient = await createRedisClient()

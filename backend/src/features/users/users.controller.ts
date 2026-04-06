@@ -11,11 +11,10 @@ import { getUserById } from './users.service'
  * @param { Request } request - Express request with the user ID in params.
  * @param { Response } response - Express response for sending the user data or errors.
  * @param { NextFunction } next - Express next function for error handling.
- * @returns { Promise<void> } Responds with 200 and user data, or 404 if not found.
+ * @returns { void } Responds with 200 and user data, or 404 if not found.
  */
 export async function getUserByIdController(request: Request, response: Response, next: NextFunction): Promise<void> {
-
-  try {
+try {
 
     const parsed = UserSchema.pick({ id: true }).safeParse(request.params)
     if (!parsed.success) {

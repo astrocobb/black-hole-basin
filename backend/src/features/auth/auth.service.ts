@@ -53,7 +53,7 @@ export async function signUp(data: SignUp): Promise<{ emailSent: boolean }> {
 /**
  * Service function to activate a user account.
  * @param { string } token - The activation token.
- * @returns { Promise<void> }
+ * @returns { void }
  */
 export async function activateUser(token: string): Promise<void> {
 

@@ -7,11 +7,10 @@ export const WellDataSchema = z.object({
   monitoringWellId: z
     .uuidv7({ error: 'Please provide a valid uuid for monitoring well id.' }),
   depthToWater: z
-    .number({ error: 'Please provide a valid number for depth to water.' }),
+    .coerce.number({ error: 'Please provide a valid number for depth to water.' }),
   dateMeasured: z
-    .iso.datetime({
-      offset: true,
-      error: 'Please provide a valid ISO datetime for date measured.'
+    .coerce.date({
+      error: 'Please provide a valid date for date measured.'
     }),
   createdAt: z
     .coerce.date({

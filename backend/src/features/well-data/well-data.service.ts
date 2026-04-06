@@ -10,7 +10,7 @@ import { insertWellData, selectWellDataById } from './well-data.repository'
  * Service function to create a new well data record.
  * @param { WellDataInput } data - The well data to insert.
  * @param { string | undefined } sessionUserId - The ID of the user making the request.
- * @returns { Promise<void> } Resolves when the well data is successfully inserted.
+ * @returns { void } Resolves when the well data is successfully inserted.
  */
 export async function postWellData(data: WellDataInput, sessionUserId: string | undefined): Promise<void> {
 

@@ -9,7 +9,7 @@ import { insertMonitoringWell, selectMonitoringWellById } from './monitoring-wel
  * Service function to create a new monitoring well record.
  * @param { MonitoringWellInput } data - The monitoring well data to insert.
  * @param { string | undefined } sessionUserId - The ID of the user making the request.
- * @returns { Promise<void> } Resolves when the well is successfully inserted.
+ * @returns { void } Resolves when the well is successfully inserted.
  */
 export async function postMonitoringWell(data: MonitoringWellInput, sessionUserId: string | undefined): Promise<void> {
 

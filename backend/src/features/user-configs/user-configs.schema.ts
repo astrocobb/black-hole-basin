@@ -3,7 +3,7 @@ import { z } from 'zod/v4'
 
 /**
  * Zod schema defining the shape and validation rules for a UserConfig entity.
- * Stores pricing and specification defaults for well drilling estimates.
+ * Stores pricing and specification default for well drilling estimates.
  */
 export const UserConfigSchema = z.object({
   id: z

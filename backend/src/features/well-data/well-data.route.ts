@@ -14,7 +14,7 @@ const basePath = '/api/well-data' as const
 /** Express router with well data endpoint definitions. */
 const router = Router()
 
-/** POST / - Create a new well data record (authenticated) */
+/** @POST / - Create a new well data record (authenticated) */
 router.route('/')
   .post(requireAuth, postWellDataController)
 

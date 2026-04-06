@@ -6,7 +6,7 @@ import { sql } from '../../lib/db'
  * Inserts a new well data record into the database.
  * Validates the well data object against WellDataInputSchema before inserting.
  * @param { WellDataInput } data - The well data object to insert.
- * @returns { Promise<void> }
+ * @returns { void }
  */
 export async function insertWellData(data: WellDataInput): Promise<void> {
 

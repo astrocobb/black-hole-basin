@@ -14,15 +14,15 @@ const basePath = '/api/auth' as const
 /** Express router with auth endpoint definitions. */
 const router = Router()
 
-/** POST /sign-in - User sign-in (public) */
+/** @POST /sign-in - User sign-in (public) */
 router.route('/sign-in')
   .post(signInController)
 
-/** POST /sign-up - User sign-up (public) */
+/** @POST /sign-up - User sign-up (public) */
 router.route('/sign-up')
   .post(signUpController)
 
-/** POST /activation - Account activation (public) */
+/** @POST /activation - Account activation (public) */
 router.route('/activation')
   .post(activationController)
 
