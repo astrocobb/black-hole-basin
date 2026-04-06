@@ -5,7 +5,6 @@ import { getUserByIdController } from './users.controller'
 
 /**
  * Users feature route module.
- * All routes require authentication via the requireAuth middleware.
  */
 
 /** Base path prefix for all user routes. */

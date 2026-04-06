@@ -11,6 +11,7 @@ import { usersRoute } from './features/users/users.route'
 import { monitoringWellsRoute } from './features/monitoring-wells/monitoring-wells.route'
 import { wellDataRoute } from './features/well-data/well-data.route'
 import { errorHandler } from './middleware/error-handler'
+import { userConfigsRoute } from './features/user-configs/user-configs.route'
 
 
 /**
@@ -89,6 +90,7 @@ export class App {
     this.app.use(usersRoute.basePath, usersRoute.router)
     this.app.use(monitoringWellsRoute.basePath, monitoringWellsRoute.router)
     this.app.use(wellDataRoute.basePath, wellDataRoute.router)
+    this.app.use(userConfigsRoute.basePath, userConfigsRoute.router)
   }
 
   /**

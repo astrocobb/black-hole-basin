@@ -8,7 +8,19 @@
       "Bash(npm uninstall:*)",
       "Bash(grep -E '\\\\.\\(tsx?|jsx?|css|json\\)$')",
       "Bash(git rm:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(xargs wc:*)",
+      "Bash(git -C /c/Users/trevo/WebstormProjects/black-hole-basin log --oneline)",
+      "Bash(git:*)",
+      "Bash(curl -sL https://raw.githubusercontent.com/alan2207/bulletproof-react/master/README.md)",
+      "Bash(curl:*)",
+      "Bash(npm run:*)",
+      "Bash(perl -pi -e 's/\\\\@\\(param|returns\\) \\\\{\\([^ }]\\)/ \\\\@$1 \\\\{ $2/g' backend/api/src/index.ts backend/api/src/App.ts backend/api/src/lib/auth.ts backend/api/src/lib/response.ts backend/api/src/middleware/require-auth.ts backend/api/src/features/users/users.controller.ts backend/api/src/features/users/users.model.ts backend/api/src/features/monitoring-wells/monitoring-wells.model.ts frontend/src/app/root.tsx frontend/src/app/routes/home.tsx frontend/src/app/routes/sign-in.tsx frontend/src/app/routes/dashboard.tsx frontend/src/app/routes/activate.tsx)",
+      "Bash(perl -pi -e 's/\\\\@\\(param|returns\\) \\\\{\\([^ }]\\)/@$1 \\\\{ $2/g' backend/api/src/index.ts backend/api/src/App.ts backend/api/src/lib/auth.ts backend/api/src/lib/response.ts backend/api/src/middleware/require-auth.ts backend/api/src/features/users/users.controller.ts backend/api/src/features/users/users.model.ts backend/api/src/features/monitoring-wells/monitoring-wells.model.ts frontend/src/app/root.tsx frontend/src/app/routes/home.tsx frontend/src/app/routes/sign-in.tsx frontend/src/app/routes/dashboard.tsx frontend/src/app/routes/activate.tsx)",
+      "Bash(perl -pi -e 's/\\\\*  \\\\{ /\\\\* @param { /g if / \\\\{ \\\\w.*- /' backend/api/src/index.ts backend/api/src/App.ts backend/api/src/lib/auth.ts backend/api/src/lib/response.ts backend/api/src/middleware/require-auth.ts backend/api/src/features/users/users.controller.ts backend/api/src/features/users/users.model.ts backend/api/src/features/monitoring-wells/monitoring-wells.model.ts frontend/src/app/root.tsx frontend/src/app/routes/home.tsx frontend/src/app/routes/sign-in.tsx frontend/src/app/routes/dashboard.tsx frontend/src/app/routes/activate.tsx)",
+      "Bash(perl -pi -e 's/\\\\*  \\\\{ /\\\\* @returns { /g if / \\\\{ \\\\w.*[^-]\\\\s*$/' backend/api/src/index.ts backend/api/src/App.ts backend/api/src/lib/auth.ts backend/api/src/lib/response.ts backend/api/src/middleware/require-auth.ts backend/api/src/features/users/users.controller.ts backend/api/src/features/users/users.model.ts backend/api/src/features/monitoring-wells/monitoring-wells.model.ts frontend/src/app/root.tsx frontend/src/app/routes/home.tsx frontend/src/app/routes/sign-in.tsx frontend/src/app/routes/dashboard.tsx frontend/src/app/routes/activate.tsx)",
+      "Bash(npx vite:*)",
+      "Bash(printf:*)"
     ]
   }
 }

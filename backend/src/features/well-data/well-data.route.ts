@@ -5,7 +5,6 @@ import { postWellDataController } from './well-data.controller'
 
 /**
  * Well data feature route module.
- * All routes require authentication via the requireAuth middleware.
  */
 
 /** Base path prefix for all well data routes. */

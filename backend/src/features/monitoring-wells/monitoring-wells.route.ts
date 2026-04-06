@@ -5,7 +5,6 @@ import { postMonitoringWellController } from './monitoring-wells.controller'
 
 /**
  * Monitoring wells feature route module.
- * All routes require authentication via the requireAuth middleware.
  */
 
 /** Base path prefix for all monitoring well routes. */

@@ -226,17 +226,17 @@ CREATE INDEX idx_well_data_well_date ON well_data (monitoring_well_id, date_meas
 
 CREATE TABLE IF NOT EXISTS user_configs
 (
-  id               UUID PRIMARY KEY,
-  user_id          UUID    NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-  name             TEXT    NOT NULL,                -- label like "Residential Standard"
-  cost_per_foot    NUMERIC NOT NULL,                -- drilling cost per foot
-  mobilization_fee NUMERIC NOT NULL DEFAULT 0,      -- flat fee for mobilizing equipment
-  casing_prices    JSONB   NOT NULL DEFAULT '{}',   -- diameter-to-price mapping
-  screen_prices    JSONB   NOT NULL DEFAULT '{}',   -- diameter-to-price mapping
-  slot_size        NUMERIC NOT NULL,                -- screen slot size
-  grain_size       NUMERIC NOT NULL,                -- gravel pack grain size
-  created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+  id                 UUID PRIMARY KEY,
+  user_id            UUID        NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  name               TEXT        NOT NULL,              -- label like "Residential Standard"
+  cost_per_foot      JSONB       NOT NULL DEFAULT '{}', -- drilling cost per foot
+  mobilization_fee   NUMERIC     NOT NULL DEFAULT 0,    -- flat fee for mobilizing equipment
+  casing_prices      JSONB       NOT NULL DEFAULT '{}', -- diameter-to-price mapping
+  screen_prices      JSONB       NOT NULL DEFAULT '{}', -- diameter-to-price mapping
+  slot_size          NUMERIC     NOT NULL,              -- screen slot size
+  gravel_pack_prices JSONB       NOT NULL DEFAULT '{}', -- gravel pack grain size
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at         TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- Speed up "show me all configs for this user" queries.
@@ -257,32 +257,32 @@ CREATE INDEX idx_user_configs_user_id ON user_configs (user_id);
 
 CREATE TABLE IF NOT EXISTS estimates
 (
-  id                        UUID PRIMARY KEY,
-  user_id                   UUID    NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-  user_config_id            UUID    NOT NULL REFERENCES user_configs (id) ON DELETE RESTRICT,
-  nearest_monitoring_well_id UUID   NOT NULL REFERENCES monitoring_wells (id) ON DELETE RESTRICT,
+  id                         UUID PRIMARY KEY,
+  user_id                    UUID        NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  user_config_id             UUID        NOT NULL REFERENCES user_configs (id) ON DELETE RESTRICT,
+  nearest_monitoring_well_id UUID        NOT NULL REFERENCES monitoring_wells (id) ON DELETE RESTRICT,
 
   -- User input
-  input_lat                 NUMERIC NOT NULL,
-  input_lon                 NUMERIC NOT NULL,
-  water_demand_gpm          NUMERIC NOT NULL,
+  input_lat                  NUMERIC     NOT NULL,
+  input_lon                  NUMERIC     NOT NULL,
+  water_demand_gpm           NUMERIC     NOT NULL,
 
   -- Calculated results
-  estimated_depth           NUMERIC NOT NULL,
-  altitude_difference       NUMERIC NOT NULL,
-  depth_to_water            NUMERIC NOT NULL,
-  casing_diameter           NUMERIC NOT NULL,  -- inches
-  screen_length             NUMERIC NOT NULL,  -- feet
-  slot_size                 NUMERIC NOT NULL,
+  estimated_depth            NUMERIC     NOT NULL,
+  altitude_difference        NUMERIC     NOT NULL,
+  depth_to_water             NUMERIC     NOT NULL,
+  casing_diameter            NUMERIC     NOT NULL, -- inches
+  screen_length              NUMERIC     NOT NULL, -- feet
+  slot_size                  NUMERIC     NOT NULL,
 
   -- Cost breakdown
-  drilling_cost             NUMERIC NOT NULL,
-  screen_cost               NUMERIC NOT NULL,
-  gravel_pack_cost          NUMERIC NOT NULL,
-  mobilization_cost         NUMERIC NOT NULL,
-  total_cost                NUMERIC NOT NULL,
+  drilling_cost              NUMERIC     NOT NULL,
+  screen_cost                NUMERIC     NOT NULL,
+  gravel_pack_cost           NUMERIC     NOT NULL,
+  mobilization_cost          NUMERIC     NOT NULL,
+  total_cost                 NUMERIC     NOT NULL,
 
-  created_at                TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at                 TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- Speed up "show me all estimates for this user" queries.
