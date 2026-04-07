@@ -1,6 +1,6 @@
-import type { UserConfigInput } from './user-configs.schema'
+import type { UserConfig, UserConfigInput } from './user-configs.schema'
 import { selectUserById } from '../users/users.repository'
-import { ConflictError, UnauthorizedError } from '../../lib/errors'
+import { ConflictError, NotFoundError, UnauthorizedError } from '../../lib/errors'
 import { assertOwnership } from '../../lib/auth'
 import { insertUserConfigs, selectUserConfigById } from './user-configs.repository'
 
@@ -22,4 +22,21 @@ export async function postUserConfig(data: UserConfigInput, sessionUserId: strin
   if (existingUserConfigs) throw new ConflictError('Create user configs failed. User configs already exists.')
 
   await insertUserConfigs(data)
+}
+
+/**
+ * Service function to retrieve a user configs record by ID.
+ * @param { string } id - The user configs ID to retrieve.
+ * @param { string | undefined } sessionUserId - The ID of the user making the request.
+ * @returns { Promise<UserConfig> } The user configs object if found, or throws an error.
+ */
+export async function getUserConfigById(id: string, sessionUserId: string | undefined): Promise<UserConfig> {
+
+  const userConfig = await selectUserConfigById(id)
+
+  if (!userConfig) throw new NotFoundError('User config not found.')
+
+  assertOwnership(sessionUserId, userConfig.userId)
+
+  return userConfig
 }

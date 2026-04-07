@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { requireAuth } from '../../middleware/require-auth'
-import { postUserConfigController } from './user-configs.controller'
+import { getUserConfigByIdController, postUserConfigController } from './user-configs.controller'
 
 
 /**
@@ -16,5 +16,9 @@ const router = Router()
 /** @POST / - Create a new user config record (authenticated) */
 router.route('/')
   .post(requireAuth, postUserConfigController)
+
+/** @GET /:id - Get a user config by ID (authenticated) */
+router.route('/:id')
+  .get(requireAuth, getUserConfigByIdController)
 
 export const userConfigsRoute = { basePath, router }

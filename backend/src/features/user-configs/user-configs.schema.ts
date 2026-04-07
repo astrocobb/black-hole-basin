@@ -16,6 +16,7 @@ export const UserConfigSchema = z.object({
     .record(z.string(), z.number({ error: 'Casing price must be a number.' }),
       { error: 'Please provide a valid casing prices object.' }),
   mobilizationFee: z
+    .coerce
     .number({ error: 'Please provide a valid number for mobilization fee.' })
     .nonnegative({ error: 'Mobilization fee must be zero or positive.' }),
   casingPrices: z
@@ -25,6 +26,7 @@ export const UserConfigSchema = z.object({
     .record(z.string(), z.number({ error: 'Screen price must be a number.' }),
       { error: 'Please provide a valid screen prices object.' }),
   slotSize: z
+    .coerce
     .number({ error: 'Please provide a valid number for slot size.' })
     .positive({ error: 'Slot size must be a positive number.' }),
   gravelPackPrices: z

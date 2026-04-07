@@ -31,7 +31,7 @@
 --
 --   REFERENCES ... ON DELETE CASCADE / RESTRICT
 --     A foreign key — it points to a row in another table.
---       CASCADE  = if the parent row is deleted, delete this row too.
+--       CASCADE = if the parent row is deleted, delete this row too.
 --       RESTRICT = if the parent row has children, BLOCK the delete.
 --
 --   TEXT vs CHAR(n)
@@ -40,7 +40,7 @@
 --     with spaces if shorter). Only use CHAR when every value is truly the
 --     same length, like a 2-letter state code or a 97-char bcrypt hash.
 --
---   NUMERIC vs FLOAT
+--   NUMERIC vs. FLOAT
 --     FLOAT stores numbers in binary — fast but can have tiny rounding
 --     errors (e.g., 0.1 + 0.2 = 0.30000000000000004). NUMERIC stores
 --     numbers as exact decimals. For measurements like well depth or
@@ -57,7 +57,7 @@
 --     You add indexes on columns you search/filter/sort by often.
 --
 --   GIST INDEX
---     A special kind of index for spatial (geographic) data. Lets PostGIS
+--     is A special kind of index for spatial (geographic) data. Lets PostGIS
 --     quickly answer questions like "find all wells within 10 miles."
 -- ============================================================================
 

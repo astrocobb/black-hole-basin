@@ -65,7 +65,7 @@ export class App {
       secret: config.session.secret,
       resave: false,
       cookie: {
-        maxAge: 2 * 60 * 60 * 1000, // 2-hour session expiry
+        maxAge: 2 * 60 * 60 * 1000,  // 2-hour session expiry
         httpOnly: true,              // Prevents client-side JavaScript access
         secure: config.nodeEnv === 'production',
         sameSite: 'lax'              // CSRF protection

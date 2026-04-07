@@ -49,6 +49,11 @@ export async function insertUserConfigs(data: UserConfigInput): Promise<void> {
   `
 }
 
+/**
+ * Selects a single user config by its unique ID.
+ * @param { string } id - The UUID of the user config to find.
+ * @returns { Promise<UserConfig | null> } The matching user config, or null if not found.
+ */
 export async function selectUserConfigById(id: string): Promise<UserConfig | null> {
 
   const rowList = await sql`

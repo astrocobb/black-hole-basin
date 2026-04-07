@@ -14,7 +14,7 @@ import { getUserById } from './users.service'
  * @returns { void } Responds with 200 and user data, or 404 if not found.
  */
 export async function getUserByIdController(request: Request, response: Response, next: NextFunction): Promise<void> {
-try {
+  try {
 
     const parsed = UserSchema.pick({ id: true }).safeParse(request.params)
     if (!parsed.success) {
@@ -24,6 +24,7 @@ try {
 
     const sessionUserId = request.session.user?.id
     const userId = parsed.data.id
+
     const user = await getUserById(userId, sessionUserId)
 
     response.status(200).json({

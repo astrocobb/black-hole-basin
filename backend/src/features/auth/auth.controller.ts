@@ -45,7 +45,7 @@ export async function signUpController(request: Request, response: Response, nex
  * @returns { void } Responds with 200 on success.
  */
 export async function activationController(request: Request, response: Response, next: NextFunction): Promise<void> {
-try {
+  try {
 
     const parsed = ActivationRequestSchema.safeParse(request.body)
 
@@ -76,7 +76,7 @@ try {
  * @returns { void } Responds with 200 on success.
  */
 export async function signInController(request: Request, response: Response, next: NextFunction): Promise<void> {
-try {
+  try {
 
     const parsed = SignInSchema.safeParse(request.body)
 
