@@ -1,6 +1,10 @@
 import { Router } from 'express'
 import { requireAuth } from '../../middleware/require-auth'
-import { getUserConfigByIdController, postUserConfigController } from './user-configs.controller'
+import {
+  getUserConfigByIdController,
+  postUserConfigController,
+  putUserConfigController
+} from './user-configs.controller'
 
 
 /**
@@ -17,7 +21,11 @@ const router = Router()
 router.route('/')
   .post(requireAuth, postUserConfigController)
 
-/** @GET /:id - Get a user config by ID (authenticated) */
+/** @PUT /:id - Update an existing user config record (authenticated) */
+router.route('/:id')
+  .put(requireAuth, putUserConfigController)
+
+/** @GET /:id - Get a user config record by ID (authenticated) */
 router.route('/:id')
   .get(requireAuth, getUserConfigByIdController)
 

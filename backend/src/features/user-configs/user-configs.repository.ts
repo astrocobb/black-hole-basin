@@ -1,4 +1,4 @@
-import { type UserConfig, type UserConfigInput, UserConfigInputSchema, UserConfigSchema } from './user-configs.schema'
+import { type UserConfigInput, type UserConfig, UserConfigInputSchema, UserConfigSchema } from './user-configs.schema'
 import { sql } from '../../lib/db'
 
 
@@ -46,6 +46,40 @@ export async function insertUserConfigs(data: UserConfigInput): Promise<void> {
       ${ slotSize },
       ${ sql.json(gravelPackPrices) }
     )
+  `
+}
+
+/**
+ * Updates an existing user config row in the database.
+ * @param { UserConfigInput } data - The user config object with updated fields.
+ * @returns { void }
+ */
+export async function updateUserConfig(data: UserConfigInput): Promise<void> {
+
+  UserConfigInputSchema.parse(data)
+
+  const {
+    id,
+    name,
+    costPerFoot,
+    mobilizationFee,
+    casingPrices,
+    screenPrices,
+    slotSize,
+    gravelPackPrices,
+  } = data
+
+  await sql`
+    UPDATE user_configs
+    SET
+      name = ${ name },
+      cost_per_foot = ${ sql.json(costPerFoot) },
+      mobilization_fee = ${ mobilizationFee },
+      casing_prices = ${ sql.json(casingPrices) },
+      screen_prices = ${ sql.json(screenPrices) },
+      slot_size = ${ slotSize },
+      gravel_pack_prices = ${ sql.json(gravelPackPrices) }
+    WHERE id = ${ id }
   `
 }
 

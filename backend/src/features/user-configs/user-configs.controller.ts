@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import { UserConfigInputSchema, UserConfigSchema } from './user-configs.schema'
 import { zodErrorResponse } from '../../lib/responses'
-import { getUserConfigById, postUserConfig } from './user-configs.service'
+import { getUserConfigById, postUserConfig, putUserConfig } from './user-configs.service'
 
 
 /**
@@ -28,6 +28,30 @@ export async function postUserConfigController(request: Request, response: Respo
       status: 201,
       data: null,
       message: 'Successfully created user config.'
+    })
+
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function putUserConfigController(request: Request, response: Response, next: NextFunction): Promise<void> {
+  try {
+
+    const parsed = UserConfigInputSchema.safeParse(request.body)
+    if (!parsed.success) {
+      zodErrorResponse(response, parsed.error)
+      return
+    }
+
+    const sessionUserId = request.session.user?.id
+    const data = parsed.data
+    await putUserConfig(data, sessionUserId)
+
+    response.status(200).json({
+      status: 200,
+      data: null,
+      message: 'Successfully updated user config.'
     })
 
   } catch (error) {

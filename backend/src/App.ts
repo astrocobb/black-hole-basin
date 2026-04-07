@@ -6,11 +6,11 @@ import type { RedisClientType } from 'redis'
 import { RedisStore } from 'connect-redis'
 import { config } from './config'
 // Route imports
+import { errorHandler } from './middleware/error-handler'
 import { authRoute } from './features/auth/auth.route'
 import { usersRoute } from './features/users/users.route'
 import { monitoringWellsRoute } from './features/monitoring-wells/monitoring-wells.route'
 import { wellDataRoute } from './features/well-data/well-data.route'
-import { errorHandler } from './middleware/error-handler'
 import { userConfigsRoute } from './features/user-configs/user-configs.route'
 
 
