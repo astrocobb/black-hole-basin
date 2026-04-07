@@ -1,6 +1,11 @@
 import { Router } from 'express'
 import { requireAuth } from '../../middleware/require-auth'
-import { postWellDataController } from './well-data.controller'
+import {
+  postWellDataController,
+  getWellDataByIdController,
+  putWellDataController,
+  deleteWellDataController
+} from './well-data.controller'
 
 
 /**
@@ -16,5 +21,13 @@ const router = Router()
 /** @POST / - Create a new well data record (authenticated) */
 router.route('/')
   .post(requireAuth, postWellDataController)
+
+/** @GET /:id - Get a well data record by ID */
+/** @PUT /:id - Update an existing well data record (authenticated) */
+/** @DELETE /:id - Delete a well data record (authenticated) */
+router.route('/:id')
+  .get(requireAuth, getWellDataByIdController)
+  .put(requireAuth, putWellDataController)
+  .delete(requireAuth, deleteWellDataController)
 
 export const wellDataRoute = { basePath, router }

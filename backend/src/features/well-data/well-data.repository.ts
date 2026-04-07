@@ -52,6 +52,42 @@ export async function selectWellDataById(id: string): Promise<WellData | null> {
 
   const result = WellDataSchema.array().max(1).parse(rowList)
 
-
   return result[0] ?? null
+}
+
+/**
+ * Updates an existing well data record in the database.
+ * @param { WellDataInput } data - The well data object with updated fields.
+ * @returns { void }
+ */
+export async function updateWellData(data: WellDataInput): Promise<void> {
+
+  WellDataInputSchema.parse(data)
+
+  const { id, monitoringWellId, dateMeasured, depthToWater } = data
+
+  await sql`
+    UPDATE well_data
+    SET
+      monitoring_well_id = ${ monitoringWellId },
+      date_measured      = ${ dateMeasured },
+      depth_to_water     = ${ depthToWater }
+    WHERE
+      id = ${ id }
+  `
+}
+
+/**
+ * Deletes a well data record from the database.
+ * @param { string } id - The UUID of the well data record to delete.
+ * @returns { void }
+ */
+export async function deleteWellData(id: string): Promise<void> {
+  await sql`
+    DELETE
+    FROM
+      well_data
+    WHERE
+      id = ${ id }
+  `
 }
