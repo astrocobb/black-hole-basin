@@ -20,7 +20,7 @@ export async function postWellDataController(request: Request, response: Respons
       return
     }
 
-    const sessionUserId = request.session.user?.id
+    const sessionUserId = request.session.user!.id
     const data = parsed.data
     await postWellDataService(data, sessionUserId)
 
