@@ -12,7 +12,7 @@ import { insertWellData, selectWellDataById } from './well-data.repository'
  * @param { string | undefined } sessionUserId - The ID of the user making the request.
  * @returns { void } Resolves when the well data is successfully inserted.
  */
-export async function postWellData(data: WellDataInput, sessionUserId: string | undefined): Promise<void> {
+export async function postWellDataService(data: WellDataInput, sessionUserId: string | undefined): Promise<void> {
 
   const monitoringWell = await selectMonitoringWellById(data.monitoringWellId)
   if (!monitoringWell) throw new NotFoundError('Monitoring well not found.')

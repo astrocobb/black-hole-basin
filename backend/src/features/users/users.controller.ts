@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import { zodErrorResponse } from '../../lib/responses'
 import { UserSchema } from './users.schema'
-import { getUserById } from './users.service'
+import { getUserByIdService } from './users.service'
 
 
 /**
@@ -25,7 +25,7 @@ export async function getUserByIdController(request: Request, response: Response
     const sessionUserId = request.session.user?.id
     const userId = parsed.data.id
 
-    const user = await getUserById(userId, sessionUserId)
+    const user = await getUserByIdService(userId, sessionUserId)
 
     response.status(200).json({
       status: 200,

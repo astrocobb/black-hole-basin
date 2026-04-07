@@ -7,7 +7,7 @@ import { sql } from '../../lib/db'
  * @param { UserConfigInput } data - The user config object to insert.
  * @returns { void }
  */
-export async function insertUserConfigs(data: UserConfigInput): Promise<void> {
+export async function insertUserConfig(data: UserConfigInput): Promise<void> {
 
   UserConfigInputSchema.parse(data)
 
@@ -20,7 +20,7 @@ export async function insertUserConfigs(data: UserConfigInput): Promise<void> {
     casingPrices,
     screenPrices,
     slotSize,
-    gravelPackPrices,
+    gravelPackPrices
   } = data
 
   await sql`
@@ -46,40 +46,6 @@ export async function insertUserConfigs(data: UserConfigInput): Promise<void> {
       ${ slotSize },
       ${ sql.json(gravelPackPrices) }
     )
-  `
-}
-
-/**
- * Updates an existing user config row in the database.
- * @param { UserConfigInput } data - The user config object with updated fields.
- * @returns { void }
- */
-export async function updateUserConfig(data: UserConfigInput): Promise<void> {
-
-  UserConfigInputSchema.parse(data)
-
-  const {
-    id,
-    name,
-    costPerFoot,
-    mobilizationFee,
-    casingPrices,
-    screenPrices,
-    slotSize,
-    gravelPackPrices,
-  } = data
-
-  await sql`
-    UPDATE user_configs
-    SET
-      name = ${ name },
-      cost_per_foot = ${ sql.json(costPerFoot) },
-      mobilization_fee = ${ mobilizationFee },
-      casing_prices = ${ sql.json(casingPrices) },
-      screen_prices = ${ sql.json(screenPrices) },
-      slot_size = ${ slotSize },
-      gravel_pack_prices = ${ sql.json(gravelPackPrices) }
-    WHERE id = ${ id }
   `
 }
 
@@ -113,4 +79,54 @@ export async function selectUserConfigById(id: string): Promise<UserConfig | nul
   const result = UserConfigSchema.array().max(1).parse(rowList)
 
   return result[0] ?? null
+}
+
+/**
+ * Updates an existing user config row in the database.
+ * @param { UserConfigInput } data - The user config object with updated fields.
+ * @returns { void }
+ */
+export async function updateUserConfig(data: UserConfigInput): Promise<void> {
+
+  UserConfigInputSchema.parse(data)
+
+  const {
+    id,
+    name,
+    costPerFoot,
+    mobilizationFee,
+    casingPrices,
+    screenPrices,
+    slotSize,
+    gravelPackPrices
+  } = data
+
+  await sql`
+    UPDATE user_configs
+    SET
+      name               = ${ name },
+      cost_per_foot      = ${ sql.json(costPerFoot) },
+      mobilization_fee   = ${ mobilizationFee },
+      casing_prices      = ${ sql.json(casingPrices) },
+      screen_prices      = ${ sql.json(screenPrices) },
+      slot_size          = ${ slotSize },
+      gravel_pack_prices = ${ sql.json(gravelPackPrices) }
+    WHERE
+      id = ${ id }
+  `
+}
+
+/**
+ * Deletes a user config row from the database.
+ * @param { string } id - The UUID of the user config to delete.
+ * @returns { void }
+ */
+export async function deleteUserConfig(id: string): Promise<void> {
+  await sql`
+    DELETE
+    FROM
+      user_configs
+    WHERE
+      id = ${ id }
+  `
 }

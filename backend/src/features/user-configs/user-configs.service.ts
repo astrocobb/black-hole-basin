@@ -1,7 +1,12 @@
 import type { UserConfig, UserConfigInput } from './user-configs.schema'
 import { ConflictError, NotFoundError } from '../../lib/errors'
 import { assertOwnership } from '../../lib/auth'
-import { insertUserConfigs, selectUserConfigById, updateUserConfig } from './user-configs.repository'
+import {
+  insertUserConfig,
+  selectUserConfigById,
+  updateUserConfig,
+  deleteUserConfig
+} from './user-configs.repository'
 
 
 /**
@@ -10,14 +15,30 @@ import { insertUserConfigs, selectUserConfigById, updateUserConfig } from './use
  * @param { string | undefined } sessionUserId - The ID of the user making the request.
  * @returns { void } Resolves when the user config is successfully inserted.
  */
-export async function postUserConfig(data: UserConfigInput, sessionUserId: string | undefined): Promise<void> {
+export async function postUserConfigService(data: UserConfigInput, sessionUserId: string): Promise<void> {
 
   assertOwnership(sessionUserId, data.userId)
 
   const existingUserConfig = await selectUserConfigById(data.id)
   if (existingUserConfig) throw new ConflictError('Create user config failed. User config already exists.')
 
-  await insertUserConfigs(data)
+  await insertUserConfig(data)
+}
+
+/**
+ * Service function to retrieve a user configs record by ID.
+ * @param { string } id - The user configs ID to retrieve.
+ * @param { string | undefined } sessionUserId - The ID of the user making the request.
+ * @returns { Promise<UserConfig> } The user configs object if found, or throws an error.
+ */
+export async function getUserConfigByIdService(id: string, sessionUserId: string): Promise<UserConfig> {
+
+  const existingUserConfig = await selectUserConfigById(id)
+  if (!existingUserConfig) throw new NotFoundError('User config not found.')
+
+  assertOwnership(sessionUserId, existingUserConfig.userId)
+
+  return existingUserConfig
 }
 
 /**
@@ -26,7 +47,7 @@ export async function postUserConfig(data: UserConfigInput, sessionUserId: strin
  * @param { string | undefined } sessionUserId - The ID of the user making the request.
  * @returns { void } Resolves when the user config is successfully updated.
  */
-export async function putUserConfig(data: UserConfigInput, sessionUserId: string | undefined): Promise<void> {
+export async function putUserConfigService(data: UserConfigInput, sessionUserId: string | undefined): Promise<void> {
 
   const existingUserConfig = await selectUserConfigById(data.id)
   if (!existingUserConfig) throw new NotFoundError('User config not found.')
@@ -37,18 +58,17 @@ export async function putUserConfig(data: UserConfigInput, sessionUserId: string
 }
 
 /**
- * Service function to retrieve a user configs record by ID.
- * @param { string } id - The user configs ID to retrieve.
+ * Service function to delete a user configs record by ID.
+ * @param { string } id - The user configs ID to delete.
  * @param { string | undefined } sessionUserId - The ID of the user making the request.
- * @returns { Promise<UserConfig> } The user configs object if found, or throws an error.
+ * @returns { void } Resolves when the user config is successfully deleted.
  */
-export async function getUserConfigById(id: string, sessionUserId: string | undefined): Promise<UserConfig> {
+export async function deleteUserConfigService(id: string, sessionUserId: string): Promise<void> {
 
-  const userConfig = await selectUserConfigById(id)
+  const existingUserConfig = await selectUserConfigById(id)
+  if (!existingUserConfig) throw new NotFoundError('User config not found.')
 
-  if (!userConfig) throw new NotFoundError('User config not found.')
+  assertOwnership(sessionUserId, existingUserConfig.userId)
 
-  assertOwnership(sessionUserId, userConfig.userId)
-
-  return userConfig
+  await deleteUserConfig(id)
 }

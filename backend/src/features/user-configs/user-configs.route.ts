@@ -1,9 +1,10 @@
 import { Router } from 'express'
 import { requireAuth } from '../../middleware/require-auth'
 import {
-  getUserConfigByIdController,
   postUserConfigController,
-  putUserConfigController
+  getUserConfigByIdController,
+  putUserConfigController,
+  deleteUserConfigController
 } from './user-configs.controller'
 
 
@@ -21,11 +22,12 @@ const router = Router()
 router.route('/')
   .post(requireAuth, postUserConfigController)
 
-/** @PUT /:id - Update an existing user config record (authenticated) */
 /** @GET /:id - Get a user config record by ID (authenticated) */
+/** @PUT /:id - Update an existing user config record (authenticated) */
+/** @DELETE /:id - Delete a user config record by ID (authenticated) */
 router.route('/:id')
-  .put(requireAuth, putUserConfigController)
   .get(requireAuth, getUserConfigByIdController)
-
+  .put(requireAuth, putUserConfigController)
+  .delete(requireAuth, deleteUserConfigController)
 
 export const userConfigsRoute = { basePath, router }

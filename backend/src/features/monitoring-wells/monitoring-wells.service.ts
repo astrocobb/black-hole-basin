@@ -11,7 +11,7 @@ import { insertMonitoringWell, selectMonitoringWellById } from './monitoring-wel
  * @param { string | undefined } sessionUserId - The ID of the user making the request.
  * @returns { void } Resolves when the well is successfully inserted.
  */
-export async function postMonitoringWell(data: MonitoringWellInput, sessionUserId: string): Promise<void> {
+export async function postMonitoringWellService(data: MonitoringWellInput, sessionUserId: string): Promise<void> {
 
   assertOwnership(sessionUserId, data.userId)
 

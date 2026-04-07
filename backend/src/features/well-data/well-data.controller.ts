@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import { WellDataInputSchema } from './well-data.schema'
 import { zodErrorResponse } from '../../lib/responses'
-import { postWellData } from './well-data.service'
+import { postWellDataService } from './well-data.service'
 
 
 /**
@@ -22,7 +22,7 @@ export async function postWellDataController(request: Request, response: Respons
 
     const sessionUserId = request.session.user?.id
     const data = parsed.data
-    await postWellData(data, sessionUserId)
+    await postWellDataService(data, sessionUserId)
 
     response.status(201).json({
       status: 201,

@@ -10,7 +10,7 @@ import { assertOwnership } from '../../lib/auth'
  * @param { string | undefined } sessionUserId - The ID of the currently authenticated user.
  * @returns { Promise<{ safeUser: SafeUser }> } The user object if found, or throws an error.
  */
-export async function getUserById(id: string, sessionUserId: string | undefined): Promise<{ safeUser: SafeUser }> {
+export async function getUserByIdService(id: string, sessionUserId: string | undefined): Promise<{ safeUser: SafeUser }> {
 
   const user = await selectUserById(id)
 

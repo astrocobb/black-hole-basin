@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import { zodErrorResponse } from '../../lib/responses'
 import { MonitoringWellInputSchema } from './monitoring-wells.schema'
-import { postMonitoringWell } from './monitoring-wells.service'
+import { postMonitoringWellService } from './monitoring-wells.service'
 
 
 /**
@@ -24,7 +24,7 @@ export async function postMonitoringWellController(request: Request, response: R
 
     const sessionUserId = request.session.user!.id
     const data = parsed.data
-    await postMonitoringWell(data, sessionUserId)
+    await postMonitoringWellService(data, sessionUserId)
 
     response.status(201).json({
       status: 201,
