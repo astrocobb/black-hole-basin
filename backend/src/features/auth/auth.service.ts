@@ -1,11 +1,11 @@
-import type { SignIn, SignUp } from './auth.schemas'
+import type { SignIn, SignUp } from './auth.schema'
 import { generateJWT, generateActivationToken, hashPassword, verifyPassword } from '../../lib/auth'
-import type { User } from '../users/users.schema'
+import type { SafeUser, User } from '../users/users.schema'
 import { insertUser, selectUserByEmail } from '../users/users.repository'
 import { deleteUserActivation, insertUserActivation, selectUserActivationByToken } from './auth.repository'
 import { resend } from '../../config/resend'
 import { config } from '../../config'
-import { BadRequestError, UnauthorizedError } from '../../lib/errors'
+import { BadRequestError, ConflictError, UnauthorizedError } from '../../lib/errors'
 import { v7 as uuid } from 'uuid'
 
 
@@ -16,11 +16,14 @@ import { v7 as uuid } from 'uuid'
  */
 export async function signUp(data: SignUp): Promise<{ emailSent: boolean }> {
 
-  const { id, email, password, name, role } = data
+  const { id, email, password, name } = data
+
+  const existingUser = await selectUserByEmail(email)
+  if (existingUser) throw new ConflictError('Sign up failed. Email already in use.')
 
   const hash = await hashPassword(password)
 
-  const user: User = { id, email, hash, name, role }
+  const user = { id, email, hash, name }
 
   await insertUser(user)
 
@@ -69,9 +72,9 @@ export async function activateUser(token: string): Promise<void> {
 /**
  * Service function to sign in a user.
  * @param { SignIn } data - The user credentials including email and password.
- * @returns { Promise<{ user: User, authorization: string, signature: string }> } The signed-in user data and JWT.
+ * @returns { user: SafeUser, authorization: string, signature: string } The signed-in user data and JWT.
  */
-export async function signIn(data: SignIn): Promise<{ user: User, authorization: string, signature: string }> {
+export async function signIn(data: SignIn): Promise<{ user: SafeUser, authorization: string, signature: string }> {
 
   const { email, password } = data
 
@@ -95,5 +98,7 @@ export async function signIn(data: SignIn): Promise<{ user: User, authorization:
     role: user.role
   }, signature)
 
-  return { user, authorization, signature }
+  const { hash, ...safeUser } = user
+
+  return { user: safeUser, authorization, signature }
 }

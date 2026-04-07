@@ -1,6 +1,6 @@
 import { App } from './App'
 import { createRedisClient } from './lib/redis'
-import type { User } from './features/users/users.schema'
+import type { SafeUser } from './features/users/users.schema'
 
 
 /**
@@ -11,7 +11,7 @@ declare module 'express-session' {
 
   /** Extended session data for storing auth state. */
   export interface SessionData {
-    user: User | undefined
+    user: SafeUser | undefined
     authorization: string | undefined
     signature: string | undefined
   }

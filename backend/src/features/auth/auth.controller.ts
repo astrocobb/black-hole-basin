@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import { zodErrorResponse } from '../../lib/responses'
-import { ActivationRequestSchema, SignInSchema, SignUpSchema } from './auth.schemas'
+import { ActivationRequestSchema, SignInSchema, SignUpSchema } from './auth.schema'
 import { activateUser, signIn, signUp } from './auth.service'
 
 

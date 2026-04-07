@@ -28,3 +28,5 @@ export type User = z.infer<typeof UserSchema>
 
 /** TypeScript type for a User without the hash field. */
 export type SafeUser = Omit<User, 'hash'>
+
+export type UserSignUp = Omit<User, 'role'>

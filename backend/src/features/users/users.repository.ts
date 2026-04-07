@@ -1,5 +1,5 @@
 import { sql } from '../../lib/db'
-import { type User, UserSchema } from './users.schema'
+import { type User, type UserSignUp, UserSchema } from './users.schema'
 
 
 /**
@@ -8,26 +8,22 @@ import { type User, UserSchema } from './users.schema'
  * @param { User } user - The user object to insert.
  * @returns { void }
  */
-export async function insertUser(user: User): Promise<void> {
+export async function insertUser(user: UserSignUp): Promise<void> {
 
-  UserSchema.parse(user)
-
-  const { id, email, hash, name, role } = user
+  const { id, email, hash, name } = user
 
   await sql`
     INSERT INTO users (
       id,
       email,
       hash,
-      name,
-      role
+      name
     )
     VALUES (
       ${ id },
       ${ email },
       ${ hash },
-      ${ name },
-      ${ role }
+      ${ name }
     )
   `
 }

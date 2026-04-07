@@ -1,5 +1,5 @@
 import { sql } from '../../lib/db'
-import { type UserActivation, UserActivationSchema } from './auth.schemas'
+import { type UserActivation, UserActivationSchema } from './auth.schema'
 
 
 /**

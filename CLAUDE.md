@@ -2,6 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## TODO
+
+- [x] Create `well-data` feature (schema, repository, controller, route) for time-series readings (`depthToWater`, `dateMeasured`)
+- [ ] Create `estimates` feature (schema, service, controller, route) for well drilling estimates
+- [ ] Create `client-configs` feature (schema, repository, controller, route, service) for pricing configuration
+- [ ] Create graceful error handling for sign-in before activation
+
+- [x] Fix activation flow — `auth.repository.ts` `selectUserActivationByToken` return type doesn't match `User | null`, activation endpoint is broken
+- [x] Update `monitoring-wells.schema.ts` to match SQL columns (`locationId`, `locationName`, `stateCode`, `countyCode`, `altitude`, `holeDepth`, `wellDepth`, `dateDrilled`)
+- [x] Update `monitoring-wells.repository.ts` queries to use real SQL columns including PostGIS `geom`
+- [x] Update `updateUser` in `users.repository.ts` to set `updated_at = now()`
+- [x] Remove commented-out `selectUserByActivationToken` from `users.repository.ts`
+
 ## Commands
 
 ```bash
@@ -115,15 +128,3 @@ React Router 7 with SSR enabled. Tailwind CSS 4 via Vite plugin. Dark theme (gra
 **Features**:
 - `estimates/` — route, controller, service, schema; repository for spatial queries
 - `client-configs/` — CRUD for pricing/config (cost per foot, casing prices, screen prices, mobilization fee)
-
-## TODO
-
-- [x] Create `well-data` feature (schema, repository, controller, route) for time-series readings (`depthToWater`, `dateMeasured`)
-- [ ] Create `estimates` feature (schema, service, controller, route) for well drilling estimates
-- [ ] Create `client-configs` feature (schema, repository, controller, route, service) for pricing configuration
-
-- [x] Fix activation flow — `auth.repository.ts` `selectUserActivationByToken` return type doesn't match `User | null`, activation endpoint is broken
-- [x] Update `monitoring-wells.schema.ts` to match SQL columns (`locationId`, `locationName`, `stateCode`, `countyCode`, `altitude`, `holeDepth`, `wellDepth`, `dateDrilled`)
-- [x] Update `monitoring-wells.repository.ts` queries to use real SQL columns including PostGIS `geom`
-- [x] Update `updateUser` in `users.repository.ts` to set `updated_at = now()`
-- [x] Remove commented-out `selectUserByActivationToken` from `users.repository.ts`

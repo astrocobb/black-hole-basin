@@ -16,9 +16,6 @@ export const SignUpSchema = z
       .string({ error: 'Please provide a valid name.' })
       .min(1, { error: 'Name must be at least 1 character.' })
       .max(64, { error: 'Name must be less than 64 characters.' }),
-    role: z
-      .enum([ 'admin', 'user' ])
-      .default('user'),
     password: z
       .string({ error: 'Password is required.' })
       .min(8, { error: 'Password cannot be less than 8 characters long.' })
