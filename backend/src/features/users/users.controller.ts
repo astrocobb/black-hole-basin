@@ -22,7 +22,7 @@ export async function getUserByIdController(request: Request, response: Response
       return
     }
 
-    const sessionUserId = request.session.user?.id
+    const sessionUserId = request.session.user!.id
     const userId = parsed.data.id
 
     const user = await getUserByIdService(userId, sessionUserId)

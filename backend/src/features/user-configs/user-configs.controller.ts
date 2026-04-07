@@ -1,10 +1,10 @@
 import type { NextFunction, Request, Response } from 'express'
 import { UserConfigInputSchema, UserConfigSchema } from './user-configs.schema'
 import { zodErrorResponse } from '../../lib/responses'
-import { 
+import {
   postUserConfigService,
   getUserConfigByIdService,
-  putUserConfigService, 
+  putUserConfigService,
   deleteUserConfigService
 } from './user-configs.service'
 
@@ -94,7 +94,7 @@ export async function putUserConfigController(request: Request, response: Respon
       return
     }
 
-    const sessionUserId = request.session.user?.id
+    const sessionUserId = request.session.user!.id
     const data = { ...parsedBody.data, id: parsedParams.data.id }
     await putUserConfigService(data, sessionUserId)
 
@@ -130,11 +130,10 @@ export async function deleteUserConfigController(request: Request, response: Res
     await deleteUserConfigService(id, sessionUserId)
 
     response.status(200).json({
-        status: 200,
-        data: null,
-        message: 'Successfully deleted user config.'
-      }
-    )
+      status: 200,
+      data: null,
+      message: 'Successfully deleted user config.'
+    })
 
   } catch (error) {
     next(error)

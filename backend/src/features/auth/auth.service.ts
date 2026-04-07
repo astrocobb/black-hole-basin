@@ -1,6 +1,6 @@
 import type { SignIn, SignUp } from './auth.schema'
 import { generateJWT, generateActivationToken, hashPassword, verifyPassword } from '../../lib/auth'
-import type { SafeUser, User } from '../users/users.schema'
+import type { SafeUser } from '../users/users.schema'
 import { insertUser, selectUserByEmail } from '../users/users.repository'
 import { deleteUserActivation, insertUserActivation, selectUserActivationByToken } from './auth.repository'
 import { resend } from '../../config/resend'
