@@ -22,11 +22,10 @@ router.route('/')
   .post(requireAuth, postUserConfigController)
 
 /** @PUT /:id - Update an existing user config record (authenticated) */
-router.route('/:id')
-  .put(requireAuth, putUserConfigController)
-
 /** @GET /:id - Get a user config record by ID (authenticated) */
 router.route('/:id')
+  .put(requireAuth, putUserConfigController)
   .get(requireAuth, getUserConfigByIdController)
+
 
 export const userConfigsRoute = { basePath, router }

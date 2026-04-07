@@ -7,7 +7,7 @@ import { getUserConfigById, postUserConfig, putUserConfig } from './user-configs
 /**
  * Handles the creation of a new user config record.
  * @param { Request } request - Express request containing user config data in the body.
- * @param { Request } response - Express response for sending the result or errors.
+ * @param { Response } response - Express response for sending the result or errors.
  * @param { NextFunction } next - Express next function for error handling.
  * @returns { void } Responds with 201 on success, or 400/401/403 on failure.
  */
@@ -35,17 +35,30 @@ export async function postUserConfigController(request: Request, response: Respo
   }
 }
 
+/**
+ * Handles the update of an existing user config record.
+ * @param { Request } request - Express request containing user config data in the body.
+ * @param { Response } response - Express response for sending the result or errors.
+ * @param { NextFunction } next - Express next function for error handling.
+ * @returns { void } Responds with 200 on success, or 400/401/403 on failure.
+ */
 export async function putUserConfigController(request: Request, response: Response, next: NextFunction): Promise<void> {
   try {
 
-    const parsed = UserConfigInputSchema.safeParse(request.body)
-    if (!parsed.success) {
-      zodErrorResponse(response, parsed.error)
+    const parsedParams = UserConfigInputSchema.pick({ id: true }).safeParse(request.params)
+    if (!parsedParams.success) {
+      zodErrorResponse(response, parsedParams.error)
+      return
+    }
+
+    const parsedBody = UserConfigInputSchema.safeParse(request.body)
+    if (!parsedBody.success) {
+      zodErrorResponse(response, parsedBody.error)
       return
     }
 
     const sessionUserId = request.session.user?.id
-    const data = parsed.data
+    const data = { ...parsedBody.data, id: parsedParams.data.id }
     await putUserConfig(data, sessionUserId)
 
     response.status(200).json({
@@ -64,7 +77,7 @@ export async function putUserConfigController(request: Request, response: Respon
  * @param { Request } request - Express request containing user config data in the body.
  * @param { Response } response - Express response for sending the result or errors.
  * @param { NextFunction } next - Express next function for error handling.
- * @returns { void } Responds with 201 on success, or 400/401/403 on failure.
+ * @returns { void } Responds with 200 on success, or 400/401/403 on failure.
  */
 export async function getUserConfigByIdController(request: Request, response: Response, next: NextFunction): Promise<void> {
   try {

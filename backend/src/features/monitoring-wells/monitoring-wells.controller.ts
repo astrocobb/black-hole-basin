@@ -22,7 +22,7 @@ export async function postMonitoringWellController(request: Request, response: R
       return
     }
 
-    const sessionUserId = request.session.user?.id
+    const sessionUserId = request.session.user!.id
     const data = parsed.data
     await postMonitoringWell(data, sessionUserId)
 

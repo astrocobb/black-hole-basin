@@ -1,6 +1,5 @@
 import type { UserConfig, UserConfigInput } from './user-configs.schema'
-import { selectUserById } from '../users/users.repository'
-import { ConflictError, NotFoundError, UnauthorizedError } from '../../lib/errors'
+import { ConflictError, NotFoundError } from '../../lib/errors'
 import { assertOwnership } from '../../lib/auth'
 import { insertUserConfigs, selectUserConfigById, updateUserConfig } from './user-configs.repository'
 
@@ -13,13 +12,10 @@ import { insertUserConfigs, selectUserConfigById, updateUserConfig } from './use
  */
 export async function postUserConfig(data: UserConfigInput, sessionUserId: string | undefined): Promise<void> {
 
-  const resourceUser = await selectUserById(data.userId)
-  if (!resourceUser) throw new UnauthorizedError('Create user configs failed. Please sign in.')
+  assertOwnership(sessionUserId, data.userId)
 
-  assertOwnership(sessionUserId, resourceUser.id)
-
-  const existingUserConfigs = await selectUserConfigById(data.id)
-  if (existingUserConfigs) throw new ConflictError('Create user configs failed. User configs already exists.')
+  const existingUserConfig = await selectUserConfigById(data.id)
+  if (existingUserConfig) throw new ConflictError('Create user config failed. User config already exists.')
 
   await insertUserConfigs(data)
 }
@@ -32,10 +28,10 @@ export async function postUserConfig(data: UserConfigInput, sessionUserId: strin
  */
 export async function putUserConfig(data: UserConfigInput, sessionUserId: string | undefined): Promise<void> {
 
-  const resourceUser = await selectUserById(data.userId)
-  if (!resourceUser) throw new UnauthorizedError('Update user configs failed. Please sign in.')
+  const existingUserConfig = await selectUserConfigById(data.id)
+  if (!existingUserConfig) throw new NotFoundError('User config not found.')
 
-  assertOwnership(sessionUserId, resourceUser.id)
+  assertOwnership(sessionUserId, existingUserConfig.userId)
 
   await updateUserConfig(data)
 }
