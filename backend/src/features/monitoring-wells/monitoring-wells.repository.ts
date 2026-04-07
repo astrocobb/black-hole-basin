@@ -94,3 +94,57 @@ export async function selectMonitoringWellById(id: string): Promise<MonitoringWe
 
   return result[0] ?? null
 }
+
+/**
+ * Updates an existing monitoring well row in the database.
+ * @param { MonitoringWellInput } data - The monitoring well object with updated fields.
+ * @returns { void }
+ */
+export async function updateMonitoringWell(data: MonitoringWellInput): Promise<void> {
+
+  MonitoringWellInputSchema.parse(data)
+
+  const {
+    id,
+    locationId,
+    locationName,
+    geom,
+    stateCode,
+    countyName,
+    altitude,
+    holeDepth,
+    wellDepth,
+    dateDrilled
+  } = data
+
+  await sql`
+    UPDATE monitoring_wells
+    SET
+      location_id   = ${ locationId },
+      location_name = ${ locationName },
+      geom          = ST_GeomFromGeoJSON(${ JSON.stringify(geom) }),
+      state_code    = ${ stateCode },
+      county_name   = ${ countyName },
+      altitude      = ${ altitude },
+      hole_depth    = ${ holeDepth },
+      well_depth    = ${ wellDepth },
+      date_drilled  = ${ dateDrilled ?? null }
+    WHERE
+      id = ${ id }
+  `
+}
+
+/**
+ * Deletes a monitoring well row from the database.
+ * @param { string } id - The UUID of the monitoring well to delete.
+ * @returns { void }
+ */
+export async function deleteMonitoringWell(id: string): Promise<void> {
+  await sql`
+    DELETE
+    FROM
+      monitoring_wells
+    WHERE
+      id = ${ id }
+  `
+}

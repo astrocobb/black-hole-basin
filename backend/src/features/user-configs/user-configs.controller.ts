@@ -126,7 +126,7 @@ export async function deleteUserConfigController(request: Request, response: Res
     }
 
     const sessionUserId = request.session.user!.id
-    const { id } = parsed.data
+    const id = parsed.data.id
     await deleteUserConfigService(id, sessionUserId)
 
     response.status(200).json({
