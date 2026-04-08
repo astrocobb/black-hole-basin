@@ -40,11 +40,16 @@ export async function postEstimateService(data: EstimateInput, sessionUserId: st
 
   // 5. Calculate costs
   const casingKey = String(casingDiameter)
+
   const drillingCost = estimatedDepth * (userConfig.costPerFoot[casingKey] ?? 0)
   const casingCost = estimatedDepth * (userConfig.casingPrices[casingKey] ?? 0)
   const screenCost = screenLength * (userConfig.screenPrices[casingKey] ?? 0)
-  const gravelPackCost = screenLength * (userConfig.gravelPackPrices[casingKey] ?? 0)
+
+  const gravelPackKey = String(userConfig.slotSize)
+  const gravelPackCost = screenLength * (userConfig.gravelPackPrices[gravelPackKey] ?? 0)
+
   const mobilizationCost = userConfig.mobilizationFee
+
   const totalCost = drillingCost + casingCost + screenCost + gravelPackCost + mobilizationCost
 
   // 6. Build and persist
