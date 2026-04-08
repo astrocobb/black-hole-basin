@@ -46,46 +46,46 @@ export default function Activate() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-800 text-gray-100">
+    <div className="min-h-screen bg-base-200 text-base-content">
       {/* Site header with page subtitle */}
-      <header className="border-b border-gray-700 px-6 py-4">
+      <header className="border-b border-base-300 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
-          <a href="/" className="text-xl font-bold tracking-tight text-white hover:text-gray-300 transition">
+          <a href="/" className="text-xl font-bold tracking-tight hover:text-neutral-content transition">
             Black Hole Basin
           </a>
-          <span className="text-sm text-gray-500">Account Activation</span>
+          <span className="text-sm text-neutral-content/70">Account Activation</span>
         </div>
       </header>
 
       <main className="mx-auto max-w-md px-6 py-10">
-        <div className="rounded-md bg-gray-700 p-6 shadow-lg text-center">
+        <div className="rounded-md border border-base-300 bg-base-100 p-6 shadow-lg text-center">
           {/* Conditional rendering based on token presence and activation status */}
           {!token ? (
-            <p className="text-gray-400">Invalid activation link. No token provided.</p>
+            <p className="text-neutral-content">Invalid activation link. No token provided.</p>
           ) : status === 'success' ? (
             <>
-              <h2 className="text-lg font-semibold text-gray-200">Account Activated</h2>
-              <p className="mt-2 text-sm text-gray-400">{message}</p>
+              <h2 className="text-lg font-semibold">Account Activated</h2>
+              <p className="mt-2 text-sm text-neutral-content">{message}</p>
               <a
                 href="/sign-in"
-                className="mt-6 inline-block rounded-md bg-blue-600 px-6 py-2.5 font-medium text-white transition hover:bg-blue-500 active:bg-blue-700"
+                className="mt-6 inline-block rounded-md bg-primary px-6 py-2.5 font-medium text-primary-content transition hover:bg-primary/90 active:bg-primary/80"
               >
                 Sign In
               </a>
             </>
           ) : status === 'error' ? (
             <>
-              <h2 className="text-lg font-semibold text-gray-200">Activation Failed</h2>
-              <p className="mt-2 text-sm text-gray-400">{message}</p>
+              <h2 className="text-lg font-semibold">Activation Failed</h2>
+              <p className="mt-2 text-sm text-neutral-content">{message}</p>
             </>
           ) : (
             <>
-              <h2 className="mb-4 text-lg font-semibold text-gray-200">Activate Your Account</h2>
+              <h2 className="mb-4 text-lg font-semibold">Activate Your Account</h2>
               <button
                 type="button"
                 onClick={handleActivate}
                 disabled={status === 'loading'}
-                className="w-full rounded-md bg-blue-600 px-4 py-2.5 font-medium text-white transition hover:bg-blue-500 active:bg-blue-700 disabled:opacity-50"
+                className="w-full rounded-md bg-primary px-4 py-2.5 font-medium text-primary-content transition hover:bg-primary/90 active:bg-primary/80 disabled:opacity-50"
               >
                 {status === 'loading' ? 'Activating...' : 'Activate Account'}
               </button>

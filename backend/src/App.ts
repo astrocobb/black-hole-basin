@@ -12,6 +12,7 @@ import { usersRoute } from './features/users/users.route'
 import { monitoringWellsRoute } from './features/monitoring-wells/monitoring-wells.route'
 import { wellDataRoute } from './features/well-data/well-data.route'
 import { userConfigsRoute } from './features/user-configs/user-configs.route'
+import { estimatesRoute } from './features/estimates/estimates.route'
 
 
 /**
@@ -88,9 +89,10 @@ export class App {
   private routes(): void {
     this.app.use(authRoute.basePath, authRoute.router)
     this.app.use(usersRoute.basePath, usersRoute.router)
+    this.app.use(userConfigsRoute.basePath, userConfigsRoute.router)
     this.app.use(monitoringWellsRoute.basePath, monitoringWellsRoute.router)
     this.app.use(wellDataRoute.basePath, wellDataRoute.router)
-    this.app.use(userConfigsRoute.basePath, userConfigsRoute.router)
+    this.app.use(estimatesRoute.basePath, estimatesRoute.router)
   }
 
   /**

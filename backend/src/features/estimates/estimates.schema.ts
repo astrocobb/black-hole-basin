@@ -6,13 +6,13 @@ import { z } from 'zod/v4'
  * Contains the user-provided location and water demand data.
  */
 export const EstimateInputSchema = z.object({
-  clientConfigId: z
+  userConfigId: z
     .uuidv7({ error: 'Please provide a valid uuid for client config id.' }),
-  lat: z
+  inputLat: z
     .number({ error: 'Please provide a valid number for latitude.' })
     .min(-90, { error: 'Latitude must be between -90 and 90.' })
     .max(90, { error: 'Latitude must be between -90 and 90.' }),
-  lon: z
+  inputLon: z
     .number({ error: 'Please provide a valid number for longitude.' })
     .min(-180, { error: 'Longitude must be between -180 and 180.' })
     .max(180, { error: 'Longitude must be between -180 and 180.' }),
@@ -45,6 +45,8 @@ export const EstimateResultSchema = z.object({
     .number({ error: 'Please provide a valid number for slot size.' }),
   drillingCost: z
     .number({ error: 'Please provide a valid number for drilling cost.' }),
+  casingCost: z
+    .number({ error: 'Please provide a valid number for casing cost.' }),
   screenCost: z
     .number({ error: 'Please provide a valid number for screen cost.' }),
   gravelPackCost: z

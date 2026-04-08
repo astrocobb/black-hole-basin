@@ -277,6 +277,7 @@ CREATE TABLE IF NOT EXISTS estimates
 
   -- Cost breakdown
   drilling_cost              NUMERIC     NOT NULL,
+  casing_cost                NUMERIC     NOT NULL,
   screen_cost                NUMERIC     NOT NULL,
   gravel_pack_cost           NUMERIC     NOT NULL,
   mobilization_cost          NUMERIC     NOT NULL,

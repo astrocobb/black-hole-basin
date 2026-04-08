@@ -125,6 +125,28 @@ React Router 7 with SSR enabled. Tailwind CSS 4 via Vite plugin. Dark theme (gra
 
 **Output**: estimated depth, casing diameter, screen length, depth to water, altitude difference, cost breakdown, nearest monitoring well reference
 
+**Endpoints**:
+- `POST /api/estimates` — run the pipeline, persist the result, return 201 with the full estimate
+- `GET /api/estimates/:id` — retrieve a saved estimate by ID (ownership check)
+- `GET /api/estimates` — list all estimates for the session user (ordered by `created_at DESC`)
+- `DELETE /api/estimates/:id` — remove a saved estimate (ownership check)
+
+**POST service flow**:
+1. Validate ownership / attach `sessionUserId`
+2. Spatial query: find nearest monitoring well to `(lat, lon)` via PostGIS `ST_Distance` → get `wellDepth`, `altitude`
+3. Query `well_data` for that well: most recent `depthToWater` (`ORDER BY date_measured DESC LIMIT 1`)
+4. Get altitude at input location (external API or lookup) → compute `altitudeDifference` and `estimatedDepth`
+5. Derive `casingDiameter` from `waterDemandGpm` (standard GPM-to-diameter rules)
+6. Derive `screenLength` from `waterDemandGpm` and `estimatedDepth`
+7. Fetch user config (`selectUserConfigById`) for pricing rates
+8. Compute costs: drilling (depth × cost-per-foot), casing, screen, gravel pack, mobilization → `totalCost`
+9. Generate estimate ID, build full estimate object, `insertEstimate`, return result
+
+**Key functions for POST**:
+- *Repository (new)*: `selectNearestMonitoringWell(lat, lon)` — PostGIS spatial query returning closest well (`id`, `wellDepth`, `altitude`); `selectLatestWellData(monitoringWellId)` — most recent `depthToWater` for a well; `insertEstimate(estimate)` — persist the full estimate
+- *Repository (existing)*: `selectUserConfigById(id)` — pulls pricing rates from user configs
+- *Calculation helpers* (pure functions in service or lib): `calculateCasingDiameter(waterDemandGpm)` — GPM-to-diameter lookup; `calculateScreenLength(waterDemandGpm, estimatedDepth)` — screen sizing; `calculateCosts(estimatedDepth, casingDiameter, screenLength, userConfig)` — returns cost breakdown
+
 **Features**:
 - `estimates/` — route, controller, service, schema; repository for spatial queries
 - `client-configs/` — CRUD for pricing/config (cost per foot, casing prices, screen prices, mobilization fee)
