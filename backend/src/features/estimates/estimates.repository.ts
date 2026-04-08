@@ -83,47 +83,6 @@ export async function insertEstimate(data: Estimate): Promise<void> {
 }
 
 /**
- * Selects an estimate by its ID.
- * @param { string } id - The ID of the estimate to select.
- * @returns { Estimate } The estimate.
- */
-export async function selectEstimateById(id: string): Promise<Estimate> {
-
-  const rowList = await sql`
-    SELECT
-      id,
-      user_id,
-      user_config_id,
-      nearest_monitoring_well_id,
-      input_lat,
-      input_lon,
-      water_demand_gpm,
-      estimated_depth,
-      altitude_difference,
-      depth_to_water,
-      casing_diameter,
-      screen_length,
-      slot_size,
-      drilling_cost,
-      casing_cost,
-      screen_cost,
-      gravel_pack_cost,
-      mobilization_cost,
-      total_cost,
-      created_at
-    FROM
-      estimates
-    WHERE
-      id = ${ id }`
-
-  const result = EstimateSchema.array().max(1).parse(rowList)
-
-  if (!result[0]) throw new NotFoundError('No estimate found.')
-
-  return result[0]
-}
-
-/**
  * Selects the nearest monitoring well to the given coordinates.
  * @param { number } lat - The latitude of the coordinates.
  * @param { number }lon - The longitude of the coordinates.
@@ -185,4 +144,66 @@ export async function selectLatestWellData(monitoringWellId: string): Promise<We
   const result = WellDataSchema.array().max(1).parse(rowList)
   if (!result[0]) throw new NotFoundError('No well data found for this monitoring well.')
   return result[0]
+}
+
+/**
+ * Selects an estimate by its ID.
+ * @param { string } id - The ID of the estimate to select.
+ * @returns { Estimate } The estimate.
+ */
+export async function selectEstimateById(id: string): Promise<Estimate> {
+
+  const rowList = await sql`
+    SELECT
+      id,
+      user_id,
+      user_config_id,
+      nearest_monitoring_well_id,
+      input_lat,
+      input_lon,
+      water_demand_gpm,
+      estimated_depth,
+      altitude_difference,
+      depth_to_water,
+      casing_diameter,
+      screen_length,
+      slot_size,
+      drilling_cost,
+      casing_cost,
+      screen_cost,
+      gravel_pack_cost,
+      mobilization_cost,
+      total_cost,
+      created_at
+    FROM
+      estimates
+    WHERE
+      id = ${ id }`
+
+  const result = EstimateSchema.array().max(1).parse(rowList)
+
+  if (!result[0]) throw new NotFoundError('No estimate found.')
+
+  return result[0]
+}
+
+/**
+ * Selects all estimates for a given user.
+ * @param { string } userId - The ID of the user.
+ * @returns { Estimate[] } An array of estimates.
+ */
+export async function selectEstimatesByUserId(userId: string): Promise<Estimate[]> {
+
+  const rowListArray = await sql`
+    SELECT 
+      * 
+    FROM 
+      estimates 
+    WHERE 
+      user_id = ${ userId }
+    ORDER BY 
+      created_at DESC
+  `
+
+  return EstimateSchema.array().parse(rowListArray)
 }

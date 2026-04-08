@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import { EstimateInputSchema, EstimateSchema } from './estimates.schema'
 import { zodErrorResponse } from '../../lib/responses'
-import { getEstimateByIdService, postEstimateService } from './estimates.service'
+import { getEstimateByIdService, getEstimatesByUserIdService, postEstimateService } from './estimates.service'
 
 
 /**
@@ -58,7 +58,31 @@ export async function getEstimateByIdController(request: Request, response: Resp
     response.status(200).json({
       status: 200,
       data: estimate,
-      message: 'Successfully got estimate.'
+      message: 'Successfully retrieved estimate.'
+    })
+
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function getEstimatesByUserIdController(request: Request, response: Response, next: NextFunction): Promise<void> {
+  try {
+
+    const parsed = EstimateSchema.pick({ userId: true }).safeParse(request.params)
+    if (!parsed.success) {
+      zodErrorResponse(response, parsed.error)
+      return
+    }
+
+    const sessionUserId = request.session.user!.id
+    const userId = parsed.data.userId
+    const estimates = await getEstimatesByUserIdService(userId, sessionUserId)
+
+    response.status(200).json({
+      status: 200,
+      data: estimates,
+      message: 'Successfully retrieved estimates.'
     })
 
   } catch (error) {

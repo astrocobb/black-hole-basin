@@ -64,7 +64,7 @@ export async function getUserConfigByIdController(request: Request, response: Re
     response.status(200).json({
       status: 200,
       data: userConfig,
-      message: 'Successfully got user config.'
+      message: 'Successfully retrieved user config.'
     })
 
   } catch (error) {

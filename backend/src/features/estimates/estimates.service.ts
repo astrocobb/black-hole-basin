@@ -3,7 +3,7 @@ import { NotFoundError } from '../../lib/errors'
 import { assertOwnership } from '../../lib/auth'
 import {
   insertEstimate,
-  selectEstimateById,
+  selectEstimateById, selectEstimatesByUserId,
   selectLatestWellData,
   selectNearestMonitoringWell
 } from './estimates.repository'
@@ -82,22 +82,6 @@ export async function postEstimateService(data: EstimateInput, sessionUserId: st
 }
 
 /**
- * Service function to retrieve an estimate by ID.
- * @param { string } id - The estimate ID to retrieve.
- * @param { string } sessionUserId - The ID of the user making the request.
- * @returns { Estimate } The estimate object if found, or throws an error.
- */
-export async function getEstimateByIdService(id: string, sessionUserId: string): Promise<Estimate> {
-
-  const existingEstimate = await selectEstimateById(id)
-  if (!existingEstimate) throw new NotFoundError('Estimate not found.')
-
-  assertOwnership(sessionUserId, existingEstimate.userId)
-
-  return existingEstimate
-}
-
-/**
  * GPM-to-casing-diameter lookup.
  * @param { number } waterDemandGpm - Requested water demand in gallons per minute.
  * @returns { number } Casing diameter in inches.
@@ -134,4 +118,36 @@ function calculateScreenLength(waterDemandGpm: number, estimatedDepth: number): 
   if (waterDemandGpm <= 500) return 60
   if (waterDemandGpm <= 1000) return 80
   return 100
+}
+
+/**
+ * Service function to retrieve an estimate by ID.
+ * @param { string } id - The estimate ID to retrieve.
+ * @param { string } sessionUserId - The ID of the user making the request.
+ * @returns { Estimate } The estimate object if found, or throws an error.
+ */
+export async function getEstimateByIdService(id: string, sessionUserId: string): Promise<Estimate> {
+
+  const existingEstimate = await selectEstimateById(id)
+  if (!existingEstimate) throw new NotFoundError('Estimate not found.')
+
+  assertOwnership(sessionUserId, existingEstimate.userId)
+
+  return existingEstimate
+}
+
+/**
+ * Service function to retrieve all estimates for a user.
+ * @param { string } userId - The ID of the user to retrieve estimates for.
+ * @param { string } sessionUserId - The ID of the user making the request.
+ * @returns { Estimate[] } An array of estimates for the user.
+ */
+export async function getEstimatesByUserIdService(userId: string, sessionUserId: string): Promise<Estimate[]> {
+
+  assertOwnership(sessionUserId, userId)
+
+  const existingEstimates = await selectEstimatesByUserId(sessionUserId)
+  if (!existingEstimates) throw new NotFoundError('Estimates not found.')
+
+  return existingEstimates
 }

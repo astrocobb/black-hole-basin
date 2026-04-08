@@ -62,7 +62,7 @@ export async function getWellDataByIdController(request: Request, response: Resp
     response.status(200).json({
       status: 200,
       data: wellData,
-      message: 'Successfully got well data.'
+      message: 'Successfully retrieved well data.'
     })
 
   } catch (error) {

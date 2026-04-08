@@ -62,7 +62,7 @@ export async function getMonitoringWellByIdController(request: Request, response
     response.status(200).json({
       status: 200,
       data: monitoringWell,
-      message: 'Successfully got monitoring well.'
+      message: 'Successfully retrieved monitoring well.'
     })
 
   } catch (error) {

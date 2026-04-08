@@ -1,6 +1,10 @@
 import { Router } from 'express'
 import { requireAuth } from '../../middleware/require-auth'
-import { getEstimateByIdController, postEstimateController } from './estimates.controller'
+import {
+  getEstimateByIdController,
+  getEstimatesByUserIdController,
+  postEstimateController
+} from './estimates.controller'
 
 
 /**
@@ -18,7 +22,11 @@ router.route('/')
   .post(requireAuth, postEstimateController)
 
 /** @GET /:id - Get an estimate by ID */
-router.route('/:id')
+router.route('/id/:id')
   .get(requireAuth, getEstimateByIdController)
+
+/** @GET /:userId - Get all estimates for a user */
+router.route('/userId/:userId')
+  .get(requireAuth, getEstimatesByUserIdController)
 
 export const estimatesRoute = { basePath, router }
