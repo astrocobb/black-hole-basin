@@ -5,16 +5,16 @@ import { type Estimate, fetchEstimates } from '../../features/estimates/api/fetc
 
 
 export default function Dashboard() {
-  const { user, isAuthenticated, signOut } = useAuth()
+  const { user, isAuthenticated, isLoading: authLoading, signOut } = useAuth()
   const navigate = useNavigate()
   const [ estimates, setEstimates ] = useState<Estimate[]>([])
   const [ loading, setLoading ] = useState(true)
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!authLoading && !isAuthenticated) {
       navigate('/sign-in')
     }
-  }, [ isAuthenticated, navigate ])
+  }, [ authLoading, isAuthenticated, navigate ])
 
   useEffect(() => {
     if (!user) return
@@ -24,7 +24,7 @@ export default function Dashboard() {
       .finally(() => setLoading(false))
   }, [ user ])
 
-  if (!isAuthenticated || !user) return null
+  if (authLoading || !isAuthenticated || !user) return null
 
   function handleSignOut() {
     signOut()

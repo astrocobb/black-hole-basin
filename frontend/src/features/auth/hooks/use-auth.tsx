@@ -19,6 +19,7 @@ export interface AuthUser {
 interface AuthContextValue {
   user: AuthUser | null
   isAuthenticated: boolean
+  isLoading: boolean
   setToken: (token: string) => void
   signOut: () => void
 }
@@ -74,6 +75,7 @@ function isTokenExpired(token: string): boolean {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const [user, setUser] = useState<AuthUser | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   // On mount, restore auth state from a previously stored JWT
   useEffect(() => {
@@ -84,6 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Clear expired token
       localStorage.removeItem(AUTH_TOKEN_KEY)
     }
+    setIsLoading(false)
   }, [])
 
   /**
@@ -107,6 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value: AuthContextValue = {
     user,
     isAuthenticated: user !== null,
+    isLoading,
     setToken,
     signOut
   }

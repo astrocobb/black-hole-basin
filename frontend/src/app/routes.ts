@@ -6,8 +6,9 @@ import { type RouteConfig, index, route } from '@react-router/dev/routes'
  * Maps URL paths to their corresponding route components.
  */
 export default [
-  index('routes/home.tsx'),                   // / - Landing page
-  route('dashboard', 'routes/dashboard.tsx'), // /dashboard - Well depth calculator
-  route('sign-in', 'routes/sign-in.tsx'),     // /sign-in - Authentication page
-  route('activate', 'routes/activate.tsx')    // /activate - Account activation page
+  index('routes/home.tsx'),                              // / - Landing page
+  route('dashboard', 'routes/dashboard.tsx'),            // /dashboard - Estimates list
+  route('estimates/new', 'routes/new-estimate.tsx'),     // /estimates/new - Create estimate
+  route('sign-in', 'routes/sign-in.tsx'),                // /sign-in - Authentication page
+  route('activate', 'routes/activate.tsx')               // /activate - Account activation page
 ] satisfies RouteConfig
