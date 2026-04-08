@@ -9,8 +9,8 @@ build/
 .nuxt/
 
 # Environment Variables & Secrets
-.env
-.env.local
+backend/.env
+frontend/.env
 .env.*.local
 *.pem
 

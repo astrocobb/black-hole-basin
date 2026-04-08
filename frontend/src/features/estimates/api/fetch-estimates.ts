@@ -30,6 +30,6 @@ interface EstimatesResponse {
 }
 
 export async function fetchEstimates(userId: string): Promise<EstimatesResponse> {
-  const res = await apiClient(`/api/estimates/user/${userId}`)
+  const res = await apiClient(`/api/estimates/userId/${userId}`)
   return res.json()
 }
