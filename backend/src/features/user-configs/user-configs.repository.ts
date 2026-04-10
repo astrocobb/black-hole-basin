@@ -50,6 +50,37 @@ export async function insertUserConfig(data: UserConfigInput): Promise<void> {
 }
 
 /**
+ * Selects all user configs belonging to a specific user.
+ * @param { string } userId - The UUID of the user whose configs to retrieve.
+ * @returns { UserConfig[] } The list of user configs, ordered by creation date descending.
+ */
+export async function selectUserConfigsByUserId(userId: string): Promise<UserConfig[]> {
+
+  const rowList = await sql`
+    SELECT
+      id,
+      user_id,
+      name,
+      cost_per_foot,
+      mobilization_fee,
+      casing_prices,
+      screen_prices,
+      slot_size,
+      gravel_pack_prices,
+      created_at,
+      updated_at
+    FROM
+      user_configs
+    WHERE
+      user_id = ${ userId }
+    ORDER BY
+      created_at DESC
+  `
+
+  return UserConfigSchema.array().parse(rowList)
+}
+
+/**
  * Selects a single user config by its unique ID.
  * @param { string } id - The UUID of the user config to find.
  * @returns { Promise<UserConfig | null> } The matching user config, or null if not found.

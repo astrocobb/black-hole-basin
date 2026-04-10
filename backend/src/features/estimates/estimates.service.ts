@@ -105,20 +105,20 @@ function calculateCasingDiameter(waterDemandGpm: number): number {
  * @param { number } estimatedDepth - Estimated well depth in feet.
  * @returns { number } Screen length in feet.
  */
-// function calculateScreenLength(waterDemandGpm: number, estimatedDepth: number): number {
-//   // Screen length is typically 10-20% of well depth, scaled by water demand.
-//   const baseRation = 0.15
-//   return Math.round(estimatedDepth * baseRation * (waterDemandGpm / 50))
-// }
 function calculateScreenLength(waterDemandGpm: number, estimatedDepth: number): number {
-  if (waterDemandGpm <= 10) return 20
-  if (waterDemandGpm <= 50) return 30
-  if (waterDemandGpm <= 100) return 40
-  if (waterDemandGpm <= 250) return 50
-  if (waterDemandGpm <= 500) return 60
-  if (waterDemandGpm <= 1000) return 80
-  return 100
+  // Screen length is typically 10-20% of well depth, scaled by water demand.
+  const baseRation = 0.15
+  return Math.round(estimatedDepth * baseRation * (waterDemandGpm / 50))
 }
+// function calculateScreenLength(waterDemandGpm: number, estimatedDepth: number): number {
+//   if (waterDemandGpm <= 10) return 20
+//   if (waterDemandGpm <= 50) return 30
+//   if (waterDemandGpm <= 100) return 40
+//   if (waterDemandGpm <= 250) return 50
+//   if (waterDemandGpm <= 500) return 60
+//   if (waterDemandGpm <= 1000) return 80
+//   return 100
+// }
 
 /**
  * Service function to retrieve an estimate by ID.

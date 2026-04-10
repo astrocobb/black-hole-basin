@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useAuth } from '../../features/auth/hooks/use-auth'
 import { createEstimate } from '../../features/estimates/api/create-estimate'
+import { type UserConfig, fetchUserConfigs } from '../../features/user-configs/api/fetch-user-configs'
 
 
 export default function NewEstimate() {
@@ -9,12 +10,22 @@ export default function NewEstimate() {
   const navigate = useNavigate()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [configs, setConfigs] = useState<UserConfig[]>([])
+  const [configsLoading, setConfigsLoading] = useState(true)
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       navigate('/sign-in')
     }
   }, [ authLoading, isAuthenticated, navigate ])
+
+  useEffect(() => {
+    if (!user) return
+    fetchUserConfigs(user.id)
+      .then(res => setConfigs(res.data))
+      .catch(console.error)
+      .finally(() => setConfigsLoading(false))
+  }, [ user ])
 
   if (authLoading || !isAuthenticated || !user) return null
 
@@ -66,16 +77,20 @@ export default function NewEstimate() {
 
             <div className="flex flex-col gap-2">
               <label htmlFor="userConfigId" className="text-sm font-medium text-neutral-content">
-                Config ID
+                Config
               </label>
-              <input
+              <select
                 id="userConfigId"
                 name="userConfigId"
-                type="text"
                 required
-                placeholder="User config UUID"
-                className="rounded-md border border-base-300 bg-base-100 px-4 py-2.5 text-base-content placeholder-neutral-content/50 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
-              />
+                disabled={ configsLoading }
+                className="rounded-md border border-base-300 bg-base-100 px-4 py-2.5 text-base-content outline-none transition focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50"
+              >
+                <option value="">{ configsLoading ? 'Loading configs...' : 'Select a config' }</option>
+                { configs.map(config => (
+                  <option key={ config.id } value={ config.id }>{ config.name }</option>
+                )) }
+              </select>
             </div>
 
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">

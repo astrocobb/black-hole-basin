@@ -9,6 +9,7 @@ export default [
   index('routes/home.tsx'),                              // / - Landing page
   route('dashboard', 'routes/dashboard.tsx'),            // /dashboard - Estimates list
   route('estimates/new', 'routes/new-estimate.tsx'),     // /estimates/new - Create estimate
+  route('estimates/:id', 'routes/estimate-detail.tsx'),  // /estimates/:id - Estimate detail
   route('sign-in', 'routes/sign-in.tsx'),                // /sign-in - Authentication page
   route('activate', 'routes/activate.tsx')               // /activate - Account activation page
 ] satisfies RouteConfig

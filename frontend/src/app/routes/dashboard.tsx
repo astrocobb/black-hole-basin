@@ -63,19 +63,22 @@ export default function Dashboard() {
           </button>
         </div>
 
-        { loading ? (
+        { loading && (
           <p className="text-neutral-content">Loading...</p>
-        ) : estimates.length === 0 ? (
+        ) }
+
+        { !loading && estimates.length === 0 && (
           <p className="text-neutral-content">No estimates yet. Create your first one.</p>
-        ) : (
+        ) }
+
+        { !loading && estimates.length > 0 && (
           <div className="flex flex-col gap-4">
             { estimates.map(estimate => (
               <button
                 key={ estimate.id }
                 type="button"
                 onClick={ () => navigate(`/estimates/${ estimate.id }`) }
-                className="rounded-md border border-base-300 bg-base-100 p-4 shadow-sm text-left transition
-  hover:border-primary"
+                className="rounded-md border border-base-300 bg-base-100 p-4 shadow-sm text-left transition hover:border-primary"
               >
                 <div className="flex items-center justify-between">
                   <div>

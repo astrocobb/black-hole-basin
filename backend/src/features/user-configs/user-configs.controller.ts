@@ -2,12 +2,44 @@ import type { NextFunction, Request, Response } from 'express'
 import { UserConfigInputSchema, UserConfigSchema } from './user-configs.schema'
 import { zodErrorResponse } from '../../lib/responses'
 import {
+  getUserConfigsByUserIdService,
   postUserConfigService,
   getUserConfigByIdService,
   putUserConfigService,
   deleteUserConfigService
 } from './user-configs.service'
 
+
+/**
+ * Handles the retrieval of all user config records for a user.
+ * @param { Request } request - Express request containing userId in the params.
+ * @param { Response } response - Express response for sending the result or errors.
+ * @param { NextFunction } next - Express next function for error handling.
+ * @returns { void } Responds with 200 on success, or 400/401/403 on failure.
+ */
+export async function getUserConfigsByUserIdController(request: Request, response: Response, next: NextFunction): Promise<void> {
+  try {
+
+    const parsed = UserConfigSchema.pick({ userId: true }).safeParse(request.params)
+    if (!parsed.success) {
+      zodErrorResponse(response, parsed.error)
+      return
+    }
+
+    const sessionUserId = request.session.user!.id
+    const userId = parsed.data.userId
+    const userConfigs = await getUserConfigsByUserIdService(userId, sessionUserId)
+
+    response.status(200).json({
+      status: 200,
+      data: userConfigs,
+      message: 'Successfully retrieved user configs.'
+    })
+
+  } catch (error) {
+    next(error)
+  }
+}
 
 /**
  * Handles the creation of a new user config record.

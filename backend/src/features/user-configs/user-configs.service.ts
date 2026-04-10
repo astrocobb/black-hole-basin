@@ -4,10 +4,25 @@ import { assertOwnership } from '../../lib/auth'
 import {
   insertUserConfig,
   selectUserConfigById,
+  selectUserConfigsByUserId,
   updateUserConfig,
   deleteUserConfig
 } from './user-configs.repository'
 
+
+/**
+ * Service function to retrieve all user configs for a user.
+ * @param { string } userId - The user ID whose configs to retrieve.
+ * @param { string } sessionUserId - The ID of the user making the request.
+ * @returns { Promise<UserConfig[]> } The list of user configs.
+ * @throws { ForbiddenError } When the session user does not own the resource.
+ */
+export async function getUserConfigsByUserIdService(userId: string, sessionUserId: string): Promise<UserConfig[]> {
+
+  assertOwnership(sessionUserId, userId)
+
+  return selectUserConfigsByUserId(userId)
+}
 
 /**
  * Service function to create a new user configs record.
