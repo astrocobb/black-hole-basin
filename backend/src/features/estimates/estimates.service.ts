@@ -2,6 +2,7 @@ import type { Estimate, EstimateInput } from './estimates.schema'
 import { NotFoundError } from '../../lib/errors'
 import { assertOwnership } from '../../lib/auth'
 import {
+  deleteEstimate,
   insertEstimate,
   selectEstimateById, selectEstimatesByUserId,
   selectLatestWellData,
@@ -137,17 +138,26 @@ export async function getEstimateByIdService(id: string, sessionUserId: string):
 }
 
 /**
- * Service function to retrieve all estimates for a user.
- * @param { string } userId - The ID of the user to retrieve estimates for.
+ * Service function to retrieve all estimates for the session user.
  * @param { string } sessionUserId - The ID of the user making the request.
  * @returns { Estimate[] } An array of estimates for the user.
  */
-export async function getEstimatesByUserIdService(userId: string, sessionUserId: string): Promise<Estimate[]> {
+export async function getEstimatesByUserIdService(sessionUserId: string): Promise<Estimate[]> {
+  return selectEstimatesByUserId(sessionUserId)
+}
 
-  assertOwnership(sessionUserId, userId)
+/**
+ * Service function to delete an estimate by ID.
+ * @param { string } id - The ID of the estimate to delete.
+ * @param { string } sessionUserId - The ID of the user making the request.
+ * @returns { void } Resolves when the estimate is successfully deleted.
+ */
+export async function deleteEstimateService(id: string, sessionUserId: string): Promise<void> {
 
-  const existingEstimates = await selectEstimatesByUserId(sessionUserId)
-  if (!existingEstimates) throw new NotFoundError('Estimates not found.')
+  const existingEstimate = await selectEstimateById(id)
+  if (!existingEstimate) throw new NotFoundError('Estimate not found.')
 
-  return existingEstimates
+  assertOwnership(sessionUserId, existingEstimate.userId)
+
+  await deleteEstimate(id)
 }

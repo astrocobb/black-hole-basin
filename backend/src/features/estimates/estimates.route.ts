@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { requireAuth } from '../../middleware/require-auth'
 import {
+  deleteEstimateController,
   getEstimateByIdController,
   getEstimatesByUserIdController,
   postEstimateController
@@ -18,15 +19,15 @@ const basePath = '/api/estimates' as const
 const router = Router()
 
 /** @POST / - Create a new estimate */
+/** @GET / - Get all estimates for the session user */
 router.route('/')
   .post(requireAuth, postEstimateController)
+  .get(requireAuth, getEstimatesByUserIdController)
 
 /** @GET /:id - Get an estimate by ID */
-router.route('/id/:id')
+/** @DELETE /:id - Delete an estimate by ID */
+router.route('/:id')
   .get(requireAuth, getEstimateByIdController)
-
-/** @GET /:userId - Get all estimates for a user */
-router.route('/userId/:userId')
-  .get(requireAuth, getEstimatesByUserIdController)
+  .delete(requireAuth, deleteEstimateController)
 
 export const estimatesRoute = { basePath, router }

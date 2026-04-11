@@ -29,7 +29,7 @@ interface EstimatesResponse {
   message: string
 }
 
-export async function fetchEstimates(userId: string): Promise<EstimatesResponse> {
-  const res = await apiClient(`/api/estimates/userId/${userId}`)
+export async function fetchEstimates(): Promise<EstimatesResponse> {
+  const res = await apiClient(`/api/estimates`)
   return res.json()
 }

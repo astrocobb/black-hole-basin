@@ -195,15 +195,49 @@ export async function selectEstimateById(id: string): Promise<Estimate> {
 export async function selectEstimatesByUserId(userId: string): Promise<Estimate[]> {
 
   const rowListArray = await sql`
-    SELECT 
-      * 
-    FROM 
-      estimates 
-    WHERE 
+    SELECT
+      id,
+      user_id,
+      user_config_id,
+      nearest_monitoring_well_id,
+      input_lat,
+      input_lon,
+      water_demand_gpm,
+      estimated_depth,
+      altitude_difference,
+      depth_to_water,
+      casing_diameter,
+      screen_length,
+      slot_size,
+      drilling_cost,
+      casing_cost,
+      screen_cost,
+      gravel_pack_cost,
+      mobilization_cost,
+      total_cost,
+      created_at
+    FROM
+      estimates
+    WHERE
       user_id = ${ userId }
-    ORDER BY 
+    ORDER BY
       created_at DESC
   `
 
   return EstimateSchema.array().parse(rowListArray)
+}
+
+/**
+ * Deletes an estimate in the database.
+ * @param { string } id - The id of the estimate to be deleted.
+ * @returns { void }
+ */
+export async function deleteEstimate(id: string): Promise<void> {
+  await sql`
+    DELETE
+    FROM
+      estimates
+    WHERE
+      id = ${ id }
+  `
 }

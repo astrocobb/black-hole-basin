@@ -4,10 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## TODO
 
-- [ ] Add `GET /api/estimates` — list all estimates for session user
-- [ ] Add `DELETE /api/estimates/:id` — remove a saved estimate (ownership check)
 - [ ] Create graceful error handling for sign-in before activation
-- [ ] Build frontend for estimates feature
+- [ ] Add OSE well logs to database
+- [ ] Implement OSE well logs into estimates or calculator
+- [ ] Add the nearest OSE wells info and monitoring well info to each estimate
+- [ ] Add a delete estimate button
 
 ## Commands
 

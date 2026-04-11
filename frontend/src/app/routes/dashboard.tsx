@@ -46,7 +46,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
             <button
               type="button"
               onClick={ handleSignOut }
-              className="rounded-md border border-base-300 px-3 py-1.5 text-sm text-neutral-content transition hover:bg-base-100"
+              className="cursor-pointer rounded-md border border-base-300 bg-base-100 px-3 py-1.5 text-sm text-neutral-content transition hover:bg-base-300"
             >
               Sign Out
             </button>
@@ -60,7 +60,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
           <div className="flex items-center gap-2">
             <Link
               to="/configs"
-              className="rounded-md border border-base-300 px-4 py-2 text-sm font-medium text-neutral-content transition hover:bg-base-100"
+              className="rounded-md border border-base-300 bg-base-100 px-4 py-2 text-sm font-medium text-neutral-content transition hover:bg-base-300"
             >
               Configs
             </Link>
