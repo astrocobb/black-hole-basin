@@ -1,17 +1,18 @@
-import { Link, redirect, useNavigate } from 'react-router'
+import { Link, redirect, useNavigate, useSearchParams } from 'react-router'
 import type { Route } from './+types/dashboard'
 import { AUTH_TOKEN_KEY } from '../../lib/api-client'
 import { useAuth } from '../../features/auth/hooks/use-auth'
-import { fetchEstimates } from '../../features/estimates/api/fetch-estimates'
+import { dashboardSections, resolveSection } from '../../features/dashboard/sections/registry'
 
 
 /**
- * Client loader that fetches the signed-in user's estimates.
- * Redirects to /sign-in when no JWT is present in localStorage.
- * @param { Route.ClientLoaderArgs } _args - React Router client loader args (unused).
- * @returns { Promise<{ estimates: Estimate[] }> } The estimates for the current user.
+ * Client loader that resolves the active dashboard section from the
+ * `view` search param and runs that section's loader. Redirects to
+ * /sign-in when no JWT is present in localStorage.
+ * @param { Route.ClientLoaderArgs } args - React Router client loader args.
+ * @returns { Promise<{ sectionId: string, data: unknown }> } The active section id and its data.
  */
-export async function clientLoader(_args: Route.ClientLoaderArgs) {
+export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   const token = localStorage.getItem(AUTH_TOKEN_KEY)
   if (!token) throw redirect('/sign-in')
 
@@ -20,18 +21,30 @@ export async function clientLoader(_args: Route.ClientLoaderArgs) {
   const userId = decoded?.auth?.id
   if (!userId) throw redirect('/sign-in')
 
-  const res = await fetchEstimates(userId)
-  return { estimates: res.data }
+  const url = new URL(request.url)
+  const section = resolveSection(url.searchParams.get('view'))
+  const data = await section.load(userId)
+  return { sectionId: section.id, data }
 }
 
 export default function Dashboard({ loaderData }: Route.ComponentProps) {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
-  const { estimates } = loaderData
+  const [ searchParams, setSearchParams ] = useSearchParams()
+  const { sectionId, data } = loaderData
+
+  const activeSection = resolveSection(sectionId)
+  const ActiveComponent = activeSection.Component
 
   function handleSignOut() {
     signOut()
     navigate('/')
+  }
+
+  function selectSection(id: string) {
+    const next = new URLSearchParams(searchParams)
+    next.set('view', id)
+    setSearchParams(next)
   }
 
   return (
@@ -55,57 +68,28 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
       </header>
 
       <main className="mx-auto max-w-4xl px-6 py-10">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold">Estimates</h2>
-          <div className="flex items-center gap-2">
-            <Link
-              to="/configs"
-              className="rounded-md border border-base-300 bg-base-100 px-4 py-2 text-sm font-medium text-neutral-content transition hover:bg-base-300"
-            >
-              Configs
-            </Link>
-            <Link
-              to="/estimates/new"
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-content transition hover:bg-primary/90"
-            >
-              New Estimate
-            </Link>
-          </div>
-        </div>
-
-        { estimates.length === 0 && (
-          <p className="text-neutral-content">No estimates yet. Create your first one.</p>
-        ) }
-
-        { estimates.length > 0 && (
-          <div className="flex flex-col gap-4">
-            { estimates.map(estimate => (
-              <Link
-                key={ estimate.id }
-                to={ `/estimates/${ estimate.id }` }
-                className="rounded-md border border-base-300 bg-base-100 p-4 shadow-sm text-left transition hover:border-primary"
+        <nav className="mb-6 flex items-center gap-2 border-b border-base-300">
+          { dashboardSections.map(section => {
+            const isActive = section.id === activeSection.id
+            return (
+              <button
+                key={ section.id }
+                type="button"
+                onClick={ () => selectSection(section.id) }
+                className={
+                  'cursor-pointer border-b-2 px-4 py-2 text-sm font-medium transition -mb-px ' +
+                  (isActive
+                    ? 'border-primary text-base-content'
+                    : 'border-transparent text-neutral-content hover:text-base-content')
+                }
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">
-                      { estimate.estimatedDepth.toFixed(0) } ft &middot; { estimate.casingDiameter }" casing
-                    </p>
-                    <p className="text-sm text-neutral-content">
-                      { estimate.inputLat.toFixed(4) }, { estimate.inputLon.toFixed(4) } &middot; {
-                      estimate.waterDemandGpm } GPM
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">${ estimate.totalCost.toFixed(2) }</p>
-                    <p className="text-sm text-neutral-content">
-                      { new Date(estimate.createdAt).toLocaleDateString() }
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            )) }
-          </div>
-        ) }
+                { section.label }
+              </button>
+            )
+          }) }
+        </nav>
+
+        <ActiveComponent data={ data } />
       </main>
     </div>
   )

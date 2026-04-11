@@ -9,6 +9,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - [ ] Implement OSE well logs into estimates or calculator
 - [ ] Add the nearest OSE wells info and monitoring well info to each estimate
 - [ ] Add a delete estimate button
+- [ ] Estimate history page with filters (date, location, cost range) and CSV export
+- [ ] Map view showing estimates + nearest monitoring wells
+- [ ] Side-by-side comparison of multiple estimates
+- [ ] PDF report generation for client deliverables
+- [ ] Historical water-level charts from `well_data` for the nearest monitoring well
+- [ ] Confidence score on estimates based on distance to nearest well + data recency
+- [ ] Shareable read-only estimate links
+- [ ] Team/organization accounts with shared client configs
+- [ ] Audit log of estimate edits
+- [ ] Password reset flow
+- [ ] Admin dashboard UI for monitoring well CRUD
+- [ ] Per-user usage metrics
 
 ## Commands
 
