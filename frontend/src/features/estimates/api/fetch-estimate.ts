@@ -8,6 +8,6 @@ interface EstimateResponse {
 }
 
 export async function fetchEstimate(id: string): Promise<EstimateResponse> {
-  const res = await apiClient(`/api/estimates/id/${id}`)
+  const res = await apiClient(`/api/estimates/${id}`)
   return res.json()
 }
