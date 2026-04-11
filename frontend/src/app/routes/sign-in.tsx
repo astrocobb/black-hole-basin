@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { type JSX, useActionState, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { v7 as uuid } from 'uuid'
 import { signIn } from '../../features/auth/api/sign-in'
@@ -11,13 +11,13 @@ import { useAuth } from '../../features/auth/hooks/use-auth'
  * Manages the active form state and renders the appropriate form component.
  * @returns { JSX.Element } The sign-in/sign-up page layout.
  */
-export default function SignIn() {
+export default function SignIn(): JSX.Element {
   // Tracks whether the sign-up form is shown (true) or the sign-in form (false)
-  const [isSignUp, setIsSignUp] = useState(false)
+  const [ isSignUp, setIsSignUp ] = useState(false)
 
   return (
     <div className="min-h-screen bg-base-200 text-base-content">
-      {/* Site header with contextual subtitle */}
+      {/* Site header with contextual subtitle */ }
       <header className="border-b border-base-300 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
           <a href="/" className="text-xl font-bold tracking-tight hover:text-neutral-content transition">
@@ -33,10 +33,10 @@ export default function SignIn() {
             { isSignUp ? 'Create Account' : 'Sign In' }
           </h2>
 
-          {/* Render the active form based on toggle state */}
+          {/* Render the active form based on toggle state */ }
           { isSignUp ? <SignUpForm/> : <SignInForm/> }
 
-          {/* Toggle link to switch between sign-in and sign-up */}
+          {/* Toggle link to switch between sign-in and sign-up */ }
           <p className="mt-6 text-center text-sm text-neutral-content">
             { isSignUp ? 'Already have an account?' : 'Don\'t have an account?' }{ ' ' }
             <button
@@ -59,50 +59,38 @@ export default function SignIn() {
  * Submits credentials to the backend API and redirects to the dashboard on success.
  * @returns { JSX.Element } The sign-in form markup.
  */
-function SignInForm() {
+function SignInForm(): JSX.Element {
   const navigate = useNavigate()
   const { setToken } = useAuth()
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
 
-  /**
-   * Handles form submission by sending credentials to the sign-in API.
-   * Stores the JWT and redirects on success, or displays an error message.
-   */
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+  const [ error, submitAction, isPending ] = useActionState(
+    async (_prev: string, formData: FormData) => {
+      const email = formData.get('email') as string
+      const password = formData.get('password') as string
 
-    const formData = new FormData(e.currentTarget)
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-
-    try {
-      const { response, token } = await signIn({ email, password })
-
-      if (response.status === 200 && token) {
-        // Store the JWT and redirect to the dashboard
-        setToken(token)
-        navigate('/dashboard')
-      } else {
-        setError(response.message)
+      try {
+        const { response, token } = await signIn({ email, password })
+        if (response.status === 200 && token) {
+          setToken(token)
+          navigate('/dashboard')
+          return ''
+        }
+        return response.message
+      } catch {
+        return 'Something went wrong. Please try again.'
       }
-    } catch {
-      setError('Something went wrong. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
+    },
+    ''
+  )
 
   return (
-    <form onSubmit={ handleSubmit } className="flex flex-col gap-6">
-      {/* Error message display */}
+    <form action={ submitAction } className="flex flex-col gap-6">
+      {/* Error message display */ }
       { error && (
         <p className="rounded-md bg-error/20 px-4 py-2.5 text-sm text-error">{ error }</p>
       ) }
 
-      {/* Email field */}
+      {/* Email field */ }
       <div className="flex flex-col gap-2">
         <label htmlFor="email" className="text-sm font-medium text-neutral-content">
           Email
@@ -117,7 +105,7 @@ function SignInForm() {
         />
       </div>
 
-      {/* Password field */}
+      {/* Password field */ }
       <div className="flex flex-col gap-2">
         <label htmlFor="password" className="text-sm font-medium text-neutral-content">
           Password
@@ -134,10 +122,10 @@ function SignInForm() {
 
       <button
         type="submit"
-        disabled={ loading }
+        disabled={ isPending }
         className="mt-2 w-full rounded-md bg-primary px-4 py-2.5 font-medium text-primary-content transition hover:bg-primary/90 active:bg-primary/80 disabled:opacity-50"
       >
-        { loading ? 'Signing in...' : 'Sign In' }
+        { isPending ? 'Signing in...' : 'Sign In' }
       </button>
     </form>
   )
@@ -149,61 +137,52 @@ function SignInForm() {
  * Submits registration data to the backend API and displays the result message.
  * @returns { JSX.Element } The sign-up form markup.
  */
-function SignUpForm() {
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [loading, setLoading] = useState(false)
+interface SignUpState {
+  error: string
+  success: string
+}
 
-  /**
-   * Handles form submission by generating a UUID, setting the default role,
-   * and sending registration data to the sign-up API.
-   */
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setError('')
-    setSuccess('')
-    setLoading(true)
+function SignUpForm(): JSX.Element {
+  const [ state, submitAction, isPending ] = useActionState(
+    async (_prev: SignUpState, formData: FormData): Promise<SignUpState> => {
+      const name = formData.get('name') as string
+      const email = formData.get('email') as string
+      const password = formData.get('password') as string
+      const passwordConfirm = formData.get('passwordConfirm') as string
 
-    const formData = new FormData(e.currentTarget)
-    const name = formData.get('name') as string
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const passwordConfirm = formData.get('passwordConfirm') as string
-
-    try {
-      const response = await signUp({
-        id: uuid(),        // Generate a UUID v7 for the new user
-        email,
-        password,
-        passwordConfirm,
-        name,
-        role: 'user'       // Default role for new registrations
-      })
-
-      if (response.status === 201) {
-        setSuccess(response.message)
-      } else {
-        setError(response.message)
+      try {
+        const response = await signUp({
+          id: uuid(),
+          email,
+          password,
+          passwordConfirm,
+          name,
+          role: 'user'
+        })
+        if (response.status === 201) {
+          return { error: '', success: response.message }
+        }
+        return { error: response.message, success: '' }
+      } catch {
+        return { error: 'Something went wrong. Please try again.', success: '' }
       }
-    } catch {
-      setError('Something went wrong. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
+    },
+    { error: '', success: '' }
+  )
 
-  // Show the success message after a successful registration
-  if (success) {
+  if (state.success) {
     return (
       <div className="text-center">
-        <p className="rounded-md bg-success/20 px-4 py-3 text-sm text-success">{ success }</p>
+        <p className="rounded-md bg-success/20 px-4 py-3 text-sm text-success">{ state.success }</p>
       </div>
     )
   }
 
+  const error = state.error
+
   return (
-    <form onSubmit={ handleSubmit } className="flex flex-col gap-6">
-      {/* Error message display */}
+    <form action={ submitAction } className="flex flex-col gap-6">
+      {/* Error message display */ }
       { error && (
         <p className="rounded-md bg-error/20 px-4 py-2.5 text-sm text-error">{ error }</p>
       ) }
@@ -271,10 +250,10 @@ function SignUpForm() {
 
       <button
         type="submit"
-        disabled={ loading }
+        disabled={ isPending }
         className="mt-2 w-full rounded-md bg-primary px-4 py-2.5 font-medium text-primary-content transition hover:bg-primary/90 active:bg-primary/80 disabled:opacity-50"
       >
-        { loading ? 'Creating Account...' : 'Create Account' }
+        { isPending ? 'Creating Account...' : 'Create Account' }
       </button>
     </form>
   )

@@ -4,7 +4,7 @@
  * Provides sign-in, sign-out, and auth state to all child components.
  */
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import React, { createContext, use, useState, useEffect } from 'react'
 import { AUTH_TOKEN_KEY } from '../../../lib/api-client'
 
 /** User claims extracted from the decoded JWT payload. */
@@ -93,19 +93,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    * Stores a new JWT and updates the user state from its claims.
    * Called after a successful sign-in.
    */
-  const setToken = useCallback((token: string) => {
+  function setToken(token: string) {
     localStorage.setItem(AUTH_TOKEN_KEY, token)
     setUser(decodeToken(token))
-  }, [])
+  }
 
   /**
    * Clears the stored JWT and resets the user state.
    * Called when the user signs out.
    */
-  const signOut = useCallback(() => {
+  function signOut() {
     localStorage.removeItem(AUTH_TOKEN_KEY)
     setUser(null)
-  }, [])
+  }
 
   const value: AuthContextValue = {
     user,
@@ -128,7 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
  * @returns { AuthContextValue } The current auth state and actions.
  */
 export function useAuth(): AuthContextValue {
-  const context = useContext(AuthContext)
+  const context = use(AuthContext)
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider')
   }

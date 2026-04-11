@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useAuth } from '../../features/auth/hooks/use-auth'
 import { createEstimate } from '../../features/estimates/api/create-estimate'
@@ -8,8 +8,6 @@ import { type UserConfig, fetchUserConfigs } from '../../features/user-configs/a
 export default function NewEstimate() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth()
   const navigate = useNavigate()
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
   const [configs, setConfigs] = useState<UserConfig[]>([])
   const [configsLoading, setConfigsLoading] = useState(true)
 
@@ -27,33 +25,28 @@ export default function NewEstimate() {
       .finally(() => setConfigsLoading(false))
   }, [ user ])
 
-  if (authLoading || !isAuthenticated || !user) return null
+  const [ error, submitAction, isPending ] = useActionState(
+    async (_prev: string, formData: FormData) => {
+      const userConfigId = formData.get('userConfigId') as string
+      const inputLat = Number(formData.get('inputLat'))
+      const inputLon = Number(formData.get('inputLon'))
+      const waterDemandGpm = Number(formData.get('waterDemandGpm'))
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-
-    const formData = new FormData(e.currentTarget)
-    const userConfigId = formData.get('userConfigId') as string
-    const inputLat = Number(formData.get('inputLat'))
-    const inputLon = Number(formData.get('inputLon'))
-    const waterDemandGpm = Number(formData.get('waterDemandGpm'))
-
-    try {
-      const response = await createEstimate({ userConfigId, inputLat, inputLon, waterDemandGpm })
-
-      if (response.status === 201) {
-        navigate('/dashboard')
-      } else {
-        setError(response.message)
+      try {
+        const response = await createEstimate({ userConfigId, inputLat, inputLon, waterDemandGpm })
+        if (response.status === 201) {
+          navigate('/dashboard')
+          return ''
+        }
+        return response.message
+      } catch {
+        return 'Something went wrong. Please try again.'
       }
-    } catch {
-      setError('Something went wrong. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
+    },
+    ''
+  )
+
+  if (authLoading || !isAuthenticated || !user) return null
 
   return (
     <div className="min-h-screen bg-base-200 text-base-content">
@@ -70,7 +63,7 @@ export default function NewEstimate() {
         <div className="rounded-md border border-base-300 bg-base-100 p-6 shadow-lg">
           <h2 className="mb-6 text-lg font-semibold">New Estimate</h2>
 
-          <form onSubmit={ handleSubmit } className="flex flex-col gap-6">
+          <form action={ submitAction } className="flex flex-col gap-6">
             { error && (
               <p className="rounded-md bg-error/20 px-4 py-2.5 text-sm text-error">{ error }</p>
             ) }
@@ -150,10 +143,10 @@ export default function NewEstimate() {
               </button>
               <button
                 type="submit"
-                disabled={ loading }
+                disabled={ isPending }
                 className="flex-1 rounded-md bg-primary px-4 py-2.5 font-medium text-primary-content transition hover:bg-primary/90 active:bg-primary/80 disabled:opacity-50"
               >
-                { loading ? 'Creating...' : 'Create Estimate' }
+                { isPending ? 'Creating...' : 'Create Estimate' }
               </button>
             </div>
           </form>
