@@ -26,7 +26,9 @@
       "Bash(perl -pi -e 's/\\\\*  \\\\{ /\\\\* @param { /g if / \\\\{ \\\\w.*- /' backend/api/src/index.ts backend/api/src/App.ts backend/api/src/lib/auth.ts backend/api/src/lib/response.ts backend/api/src/middleware/require-auth.ts backend/api/src/features/users/users.controller.ts backend/api/src/features/users/users.model.ts backend/api/src/features/monitoring-wells/monitoring-wells.model.ts frontend/src/app/root.tsx frontend/src/app/routes/home.tsx frontend/src/app/routes/sign-in.tsx frontend/src/app/routes/dashboard.tsx frontend/src/app/routes/activate.tsx)",
       "Bash(perl -pi -e 's/\\\\*  \\\\{ /\\\\* @returns { /g if / \\\\{ \\\\w.*[^-]\\\\s*$/' backend/api/src/index.ts backend/api/src/App.ts backend/api/src/lib/auth.ts backend/api/src/lib/response.ts backend/api/src/middleware/require-auth.ts backend/api/src/features/users/users.controller.ts backend/api/src/features/users/users.model.ts backend/api/src/features/monitoring-wells/monitoring-wells.model.ts frontend/src/app/root.tsx frontend/src/app/routes/home.tsx frontend/src/app/routes/sign-in.tsx frontend/src/app/routes/dashboard.tsx frontend/src/app/routes/activate.tsx)",
       "Bash(npx vite:*)",
-      "Bash(printf:*)"
+      "Bash(printf:*)",
+      "Bash(npx react-router:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
