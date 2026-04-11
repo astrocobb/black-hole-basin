@@ -1,4 +1,4 @@
-import React from 'react'
+import { Link } from 'react-router'
 import { useAuth } from '../../features/auth/hooks/use-auth'
 
 
@@ -69,19 +69,19 @@ export default function Home() {
 
         {/* Call-to-action buttons — change based on auth state */}
         <div className="mt-12 flex justify-center gap-4">
-          <a
-            href="/dashboard"
+          <Link
+            to="/dashboard"
             className="rounded-md bg-primary px-6 py-2.5 font-medium text-primary-content transition hover:bg-primary/90 active:bg-primary/80"
           >
             Go to Dashboard
-          </a>
+          </Link>
           { !isAuthenticated && (
-            <a
-              href="/sign-in"
+            <Link
+              to="/sign-in"
               className="rounded-md border border-base-300 px-6 py-2.5 font-medium text-neutral-content transition hover:bg-base-100"
             >
               Sign In
-            </a>
+            </Link>
           ) }
         </div>
       </main>

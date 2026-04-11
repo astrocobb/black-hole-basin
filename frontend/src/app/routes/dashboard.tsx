@@ -1,30 +1,33 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { Link, redirect, useNavigate } from 'react-router'
+import type { Route } from './+types/dashboard'
+import { AUTH_TOKEN_KEY } from '../../lib/api-client'
 import { useAuth } from '../../features/auth/hooks/use-auth'
-import { type Estimate, fetchEstimates } from '../../features/estimates/api/fetch-estimates'
+import { fetchEstimates } from '../../features/estimates/api/fetch-estimates'
 
 
-export default function Dashboard() {
-  const { user, isAuthenticated, isLoading: authLoading, signOut } = useAuth()
+/**
+ * Client loader that fetches the signed-in user's estimates.
+ * Redirects to /sign-in when no JWT is present in localStorage.
+ * @param { Route.ClientLoaderArgs } _args - React Router client loader args (unused).
+ * @returns { Promise<{ estimates: Estimate[] }> } The estimates for the current user.
+ */
+export async function clientLoader(_args: Route.ClientLoaderArgs) {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY)
+  if (!token) throw redirect('/sign-in')
+
+  const payload = token.split('.')[1]
+  const decoded = payload ? JSON.parse(atob(payload)) : null
+  const userId = decoded?.auth?.id
+  if (!userId) throw redirect('/sign-in')
+
+  const res = await fetchEstimates(userId)
+  return { estimates: res.data }
+}
+
+export default function Dashboard({ loaderData }: Route.ComponentProps) {
+  const { user, signOut } = useAuth()
   const navigate = useNavigate()
-  const [ estimates, setEstimates ] = useState<Estimate[]>([])
-  const [ loading, setLoading ] = useState(true)
-
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate('/sign-in')
-    }
-  }, [ authLoading, isAuthenticated, navigate ])
-
-  useEffect(() => {
-    if (!user) return
-    fetchEstimates(user.id)
-      .then(res => setEstimates(res.data))
-      .catch(console.error)
-      .finally(() => setLoading(false))
-  }, [ user ])
-
-  if (authLoading || !isAuthenticated || !user) return null
+  const { estimates } = loaderData
 
   function handleSignOut() {
     signOut()
@@ -35,11 +38,11 @@ export default function Dashboard() {
     <div className="min-h-screen bg-base-200 text-base-content">
       <header className="border-b border-base-300 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
-          <a href="/" className="text-xl font-bold tracking-tight hover:text-neutral-content transition">
+          <Link to="/" className="text-xl font-bold tracking-tight hover:text-neutral-content transition">
             Black Hole Basin
-          </a>
+          </Link>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-neutral-content">{ user.name }</span>
+            <span className="text-sm text-neutral-content">{ user?.name }</span>
             <button
               type="button"
               onClick={ handleSignOut }
@@ -54,30 +57,32 @@ export default function Dashboard() {
       <main className="mx-auto max-w-4xl px-6 py-10">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold">Estimates</h2>
-          <button
-            type="button"
-            onClick={ () => navigate('/estimates/new') }
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-content transitionhover:bg-primary/90"
-          >
-            New Estimate
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/configs"
+              className="rounded-md border border-base-300 px-4 py-2 text-sm font-medium text-neutral-content transition hover:bg-base-100"
+            >
+              Configs
+            </Link>
+            <Link
+              to="/estimates/new"
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-content transition hover:bg-primary/90"
+            >
+              New Estimate
+            </Link>
+          </div>
         </div>
 
-        { loading && (
-          <p className="text-neutral-content">Loading...</p>
-        ) }
-
-        { !loading && estimates.length === 0 && (
+        { estimates.length === 0 && (
           <p className="text-neutral-content">No estimates yet. Create your first one.</p>
         ) }
 
-        { !loading && estimates.length > 0 && (
+        { estimates.length > 0 && (
           <div className="flex flex-col gap-4">
             { estimates.map(estimate => (
-              <button
+              <Link
                 key={ estimate.id }
-                type="button"
-                onClick={ () => navigate(`/estimates/${ estimate.id }`) }
+                to={ `/estimates/${ estimate.id }` }
                 className="rounded-md border border-base-300 bg-base-100 p-4 shadow-sm text-left transition hover:border-primary"
               >
                 <div className="flex items-center justify-between">
@@ -97,7 +102,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                 </div>
-              </button>
+              </Link>
             )) }
           </div>
         ) }

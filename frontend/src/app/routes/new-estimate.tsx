@@ -1,29 +1,33 @@
-import { useActionState, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router'
-import { useAuth } from '../../features/auth/hooks/use-auth'
+import { useActionState } from 'react'
+import { Link, redirect, useNavigate } from 'react-router'
+import type { Route } from './+types/new-estimate'
+import { AUTH_TOKEN_KEY } from '../../lib/api-client'
 import { createEstimate } from '../../features/estimates/api/create-estimate'
-import { type UserConfig, fetchUserConfigs } from '../../features/user-configs/api/fetch-user-configs'
+import { fetchUserConfigs } from '../../features/user-configs/api/fetch-user-configs'
 
 
-export default function NewEstimate() {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth()
+/**
+ * Client loader that fetches the signed-in user's saved configs.
+ * Redirects to /sign-in when no JWT is present in localStorage.
+ * @param { Route.ClientLoaderArgs } _args - React Router client loader args (unused).
+ * @returns { Promise<{ configs: UserConfig[] }> } The user's configs.
+ */
+export async function clientLoader(_args: Route.ClientLoaderArgs) {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY)
+  if (!token) throw redirect('/sign-in')
+
+  const payload = token.split('.')[1]
+  const decoded = payload ? JSON.parse(atob(payload)) : null
+  const userId = decoded?.auth?.id
+  if (!userId) throw redirect('/sign-in')
+
+  const res = await fetchUserConfigs(userId)
+  return { configs: res.data }
+}
+
+export default function NewEstimate({ loaderData }: Route.ComponentProps) {
+  const { configs } = loaderData
   const navigate = useNavigate()
-  const [configs, setConfigs] = useState<UserConfig[]>([])
-  const [configsLoading, setConfigsLoading] = useState(true)
-
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate('/sign-in')
-    }
-  }, [ authLoading, isAuthenticated, navigate ])
-
-  useEffect(() => {
-    if (!user) return
-    fetchUserConfigs(user.id)
-      .then(res => setConfigs(res.data))
-      .catch(console.error)
-      .finally(() => setConfigsLoading(false))
-  }, [ user ])
 
   const [ error, submitAction, isPending ] = useActionState(
     async (_prev: string, formData: FormData) => {
@@ -46,15 +50,13 @@ export default function NewEstimate() {
     ''
   )
 
-  if (authLoading || !isAuthenticated || !user) return null
-
   return (
     <div className="min-h-screen bg-base-200 text-base-content">
       <header className="border-b border-base-300 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
-          <a href="/" className="text-xl font-bold tracking-tight hover:text-neutral-content transition">
+          <Link to="/" className="text-xl font-bold tracking-tight hover:text-neutral-content transition">
             Black Hole Basin
-          </a>
+          </Link>
           <span className="text-sm text-neutral-content/70">New Estimate</span>
         </div>
       </header>
@@ -76,10 +78,9 @@ export default function NewEstimate() {
                 id="userConfigId"
                 name="userConfigId"
                 required
-                disabled={ configsLoading }
-                className="rounded-md border border-base-300 bg-base-100 px-4 py-2.5 text-base-content outline-none transition focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50"
+                className="rounded-md border border-base-300 bg-base-100 px-4 py-2.5 text-base-content outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
               >
-                <option value="">{ configsLoading ? 'Loading configs...' : 'Select a config' }</option>
+                <option value="">Select a config</option>
                 { configs.map(config => (
                   <option key={ config.id } value={ config.id }>{ config.name }</option>
                 )) }
@@ -134,13 +135,12 @@ export default function NewEstimate() {
             </div>
 
             <div className="flex gap-3 mt-2">
-              <button
-                type="button"
-                onClick={ () => navigate('/dashboard') }
-                className="flex-1 rounded-md border border-base-300 px-4 py-2.5 font-medium text-neutral-content transition hover:bg-base-200"
+              <Link
+                to="/dashboard"
+                className="flex-1 rounded-md border border-base-300 px-4 py-2.5 font-medium text-neutral-content transition hover:bg-base-200 text-center"
               >
                 Cancel
-              </button>
+              </Link>
               <button
                 type="submit"
                 disabled={ isPending }

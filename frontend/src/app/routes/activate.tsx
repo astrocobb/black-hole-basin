@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useSearchParams } from 'react-router'
+import { useState } from 'react'
+import { Link, useSearchParams } from 'react-router'
 import { apiClient } from '../../lib/api-client'
 
 
@@ -50,9 +50,9 @@ export default function Activate() {
       { /* Site header with page subtitle */ }
       <header className="border-b border-base-300 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
-          <a href="/" className="text-xl font-bold tracking-tight hover:text-neutral-content transition">
+          <Link to="/" className="text-xl font-bold tracking-tight hover:text-neutral-content transition">
             Black Hole Basin
-          </a>
+          </Link>
           <span className="text-sm text-neutral-content/70">Account Activation</span>
         </div>
       </header>
@@ -66,12 +66,12 @@ export default function Activate() {
             <>
               <h2 className="text-lg font-semibold">Account Activated</h2>
               <p className="mt-2 text-sm text-neutral-content">{ message }</p>
-              <a
-                href="/sign-in"
+              <Link
+                to="/sign-in"
                 className="mt-6 inline-block rounded-md bg-primary px-6 py-2.5 font-medium text-primary-content transition hover:bg-primary/90 active:bg-primary/80"
               >
                 Sign In
-              </a>
+              </Link>
             </>
           ) : status === 'error' ? (
             <>

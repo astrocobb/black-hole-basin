@@ -1,65 +1,51 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
-import { useAuth } from '../../features/auth/hooks/use-auth'
-import type { Estimate } from '../../features/estimates/api/fetch-estimates'
+import { Link, redirect } from 'react-router'
+import type { Route } from './+types/estimate-detail'
+import { AUTH_TOKEN_KEY } from '../../lib/api-client'
 import { fetchEstimate } from '../../features/estimates/api/fetch-estimate'
 
 
-export default function EstimateDetail() {
-  const { id } = useParams<{ id: string }>()
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth()
-  const navigate = useNavigate()
-  const [estimate, setEstimate] = useState<Estimate | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+/**
+ * Client loader that fetches a single estimate by id.
+ * Redirects to /sign-in when the user is unauthenticated.
+ * @param { Route.ClientLoaderArgs } args - Contains the `:id` route parameter.
+ * @returns { Promise<{ estimate: Estimate | null, error: string }> } The estimate and/or an error message.
+ */
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY)
+  if (!token) throw redirect('/sign-in')
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate('/sign-in')
-    }
-  }, [authLoading, isAuthenticated, navigate])
+  const res = await fetchEstimate(params.id)
+  if (res.status === 200) {
+    return { estimate: res.data, error: '' }
+  }
+  return { estimate: null, error: res.message }
+}
 
-  useEffect(() => {
-    if (!user || !id) return
-    fetchEstimate(id)
-      .then(res => {
-        if (res.status === 200) {
-          setEstimate(res.data)
-        } else {
-          setError(res.message)
-        }
-      })
-      .catch(() => setError('Failed to load estimate.'))
-      .finally(() => setLoading(false))
-  }, [user, id])
-
-  if (authLoading || !isAuthenticated || !user) return null
+export default function EstimateDetail({ loaderData }: Route.ComponentProps) {
+  const { estimate, error } = loaderData
 
   return (
     <div className="min-h-screen bg-base-200 text-base-content">
       <header className="border-b border-base-300 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
-          <a href="/" className="text-xl font-bold tracking-tight hover:text-neutral-content transition">
+          <Link to="/" className="text-xl font-bold tracking-tight hover:text-neutral-content transition">
             Black Hole Basin
-          </a>
-          <button
-            type="button"
-            onClick={ () => navigate('/dashboard') }
+          </Link>
+          <Link
+            to="/dashboard"
             className="rounded-md border border-base-300 px-3 py-1.5 text-sm text-neutral-content transition hover:bg-base-100"
           >
             Back to Dashboard
-          </button>
+          </Link>
         </div>
       </header>
 
       <main className="mx-auto max-w-4xl px-6 py-10">
-        { loading && <p className="text-neutral-content">Loading...</p> }
-
         { error && (
           <p className="rounded-md bg-error/20 px-4 py-2.5 text-sm text-error">{ error }</p>
         ) }
 
-        { !loading && !error && estimate && (
+        { estimate && (
           <>
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-lg font-semibold">Estimate Details</h2>

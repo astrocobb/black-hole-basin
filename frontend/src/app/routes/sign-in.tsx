@@ -1,5 +1,5 @@
 import { type JSX, useActionState, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { v7 as uuid } from 'uuid'
 import { signIn } from '../../features/auth/api/sign-in'
 import { signUp } from '../../features/auth/api/sign-up'
@@ -17,12 +17,12 @@ export default function SignIn(): JSX.Element {
 
   return (
     <div className="min-h-screen bg-base-200 text-base-content">
-      {/* Site header with contextual subtitle */ }
+      {/* Site header with contextual subtitle */}
       <header className="border-b border-base-300 px-6 py-4">
         <div className="mx-auto max-w-4xl flex items-center justify-between">
-          <a href="/" className="text-xl font-bold tracking-tight hover:text-neutral-content transition">
+          <Link to="/" className="text-xl font-bold tracking-tight hover:text-neutral-content transition">
             Black Hole Basin
-          </a>
+          </Link>
           <span className="text-sm text-neutral-content/70">{ isSignUp ? 'Create Account' : 'Sign In' }</span>
         </div>
       </header>
@@ -52,7 +52,6 @@ export default function SignIn(): JSX.Element {
     </div>
   )
 }
-
 
 /**
  * Sign-in form component with email and password fields.
@@ -130,7 +129,6 @@ function SignInForm(): JSX.Element {
     </form>
   )
 }
-
 
 /**
  * Sign-up form component with name, email, password, and confirm password fields.
