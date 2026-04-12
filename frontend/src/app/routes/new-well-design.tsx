@@ -1,8 +1,8 @@
 import { useActionState } from 'react'
-import { Link, redirect, useNavigate } from 'react-router'
-import type { Route } from './+types/new-estimate'
+import { Link, redirect, useNavigate, useSearchParams } from 'react-router'
+import type { Route } from './+types/new-well-design'
 import { AUTH_TOKEN_KEY } from '../../lib/api-client'
-import { createEstimate } from '../../features/estimates/api/create-estimate'
+import { createWellDesign, type CreateWellDesignInput } from '../../features/well-designs/api/create-well-design'
 import { fetchUserConfigs } from '../../features/user-configs/api/fetch-user-configs'
 
 
@@ -25,21 +25,32 @@ export async function clientLoader(_args: Route.ClientLoaderArgs) {
   return { configs: res.data }
 }
 
-export default function NewEstimate({ loaderData }: Route.ComponentProps) {
+export default function NewWellDesign({ loaderData }: Route.ComponentProps) {
   const { configs } = loaderData
   const navigate = useNavigate()
+  const [ searchParams ] = useSearchParams()
+
+  const prefilledDepth = searchParams.get('estimatedDepth')
+  const useSuppliedDepth = prefilledDepth != null && prefilledDepth !== ''
 
   const [ error, submitAction, isPending ] = useActionState(
     async (_prev: string, formData: FormData) => {
       const userConfigId = formData.get('userConfigId') as string
-      const inputLat = Number(formData.get('inputLat'))
-      const inputLon = Number(formData.get('inputLon'))
       const waterDemandGpm = Number(formData.get('waterDemandGpm'))
 
+      const input: CreateWellDesignInput = { userConfigId, waterDemandGpm }
+
+      if (useSuppliedDepth) {
+        input.estimatedDepth = Number(prefilledDepth)
+      } else {
+        input.inputLat = Number(formData.get('inputLat'))
+        input.inputLon = Number(formData.get('inputLon'))
+      }
+
       try {
-        const response = await createEstimate({ userConfigId, inputLat, inputLon, waterDemandGpm })
+        const response = await createWellDesign(input)
         if (response.status === 201) {
-          navigate('/dashboard')
+          navigate('/dashboard?view=well-designs')
           return ''
         }
         return response.message
@@ -57,13 +68,13 @@ export default function NewEstimate({ loaderData }: Route.ComponentProps) {
           <Link to="/" className="text-xl font-bold tracking-tight hover:text-neutral-content transition">
             Black Hole Basin
           </Link>
-          <span className="text-sm text-neutral-content/70">New Estimate</span>
+          <span className="text-sm text-neutral-content/70">New Well Design</span>
         </div>
       </header>
 
       <main className="mx-auto max-w-md px-6 py-10">
         <div className="rounded-md border border-base-300 bg-base-100 p-6 shadow-lg">
-          <h2 className="mb-6 text-lg font-semibold">New Estimate</h2>
+          <h2 className="mb-6 text-lg font-semibold">New Well Design</h2>
 
           <form action={ submitAction } className="flex flex-col gap-6">
             { error && (
@@ -87,37 +98,47 @@ export default function NewEstimate({ loaderData }: Route.ComponentProps) {
               </select>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div className="flex flex-col gap-2">
-                <label htmlFor="inputLat" className="text-sm font-medium text-neutral-content">
-                  Latitude
-                </label>
-                <input
-                  id="inputLat"
-                  name="inputLat"
-                  type="number"
-                  step="any"
-                  required
-                  placeholder="e.g. 32.7157"
-                  className="rounded-md border border-base-300 bg-base-100 px-4 py-2.5 text-base-content placeholder-neutral-content/50 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
-                />
+            { useSuppliedDepth ? (
+              <div className="rounded-md border border-base-300 bg-base-200 px-4 py-3 text-sm">
+                <p className="text-neutral-content">Estimated Depth</p>
+                <p className="font-medium">{ Number(prefilledDepth).toFixed(0) } ft</p>
+                <p className="mt-1 text-xs text-neutral-content/70">
+                  Supplied by the depth calculator. <Link to="/well-designs/new" className="underline">Use a location instead</Link>
+                </p>
               </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="inputLat" className="text-sm font-medium text-neutral-content">
+                    Latitude
+                  </label>
+                  <input
+                    id="inputLat"
+                    name="inputLat"
+                    type="number"
+                    step="any"
+                    required
+                    placeholder="e.g. 32.7157"
+                    className="rounded-md border border-base-300 bg-base-100 px-4 py-2.5 text-base-content placeholder-neutral-content/50 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
+                  />
+                </div>
 
-              <div className="flex flex-col gap-2">
-                <label htmlFor="inputLon" className="text-sm font-medium text-neutral-content">
-                  Longitude
-                </label>
-                <input
-                  id="inputLon"
-                  name="inputLon"
-                  type="number"
-                  step="any"
-                  required
-                  placeholder="e.g. -117.1611"
-                  className="rounded-md border border-base-300 bg-base-100 px-4 py-2.5 text-base-content placeholder-neutral-content/50 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
-                />
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="inputLon" className="text-sm font-medium text-neutral-content">
+                    Longitude
+                  </label>
+                  <input
+                    id="inputLon"
+                    name="inputLon"
+                    type="number"
+                    step="any"
+                    required
+                    placeholder="e.g. -117.1611"
+                    className="rounded-md border border-base-300 bg-base-100 px-4 py-2.5 text-base-content placeholder-neutral-content/50 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
+                  />
+                </div>
               </div>
-            </div>
+            ) }
 
             <div className="flex flex-col gap-2">
               <label htmlFor="waterDemandGpm" className="text-sm font-medium text-neutral-content">
@@ -146,7 +167,7 @@ export default function NewEstimate({ loaderData }: Route.ComponentProps) {
                 disabled={ isPending }
                 className="flex-1 rounded-md bg-primary px-4 py-2.5 font-medium text-primary-content transition hover:bg-primary/90 active:bg-primary/80 disabled:opacity-50"
               >
-                { isPending ? 'Creating...' : 'Create Estimate' }
+                { isPending ? 'Creating...' : 'Create' }
               </button>
             </div>
           </form>

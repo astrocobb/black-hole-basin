@@ -244,33 +244,37 @@ CREATE INDEX idx_user_configs_user_id ON user_configs (user_id);
 
 
 -- ============================================================================
--- ESTIMATES (persisted well drilling estimates)
+-- WELL DESIGNS (persisted well-drilling designs)
 -- ============================================================================
--- Each row is a saved estimate combining user input (location, water demand),
--- calculated results (depth, casing, screen), and cost breakdown. References
--- the nearest monitoring well used for the calculation and the user config
--- that provided pricing.
+-- Each row is a saved well design combining the caller's inputs, the derived
+-- depth (either calculated from a location via the depth calculator, or
+-- supplied directly), casing/screen specs, and a cost breakdown.
+--
+-- input_lat/input_lon, nearest_monitoring_well_id, altitude_difference, and
+-- depth_to_water are nullable because a caller may submit a precomputed
+-- estimatedDepth without engaging the depth calculator — in that case there
+-- is no associated monitoring well or altitude comparison.
 --
 -- ON DELETE RESTRICT on user_config_id: don't allow deleting a config that
--- has estimates referencing it — the user should reassign or delete the
--- estimates first.
+-- has well designs referencing it — the user should reassign or delete the
+-- well designs first.
 
-CREATE TABLE IF NOT EXISTS estimates
+CREATE TABLE IF NOT EXISTS well_designs
 (
   id                         UUID PRIMARY KEY,
   user_id                    UUID        NOT NULL REFERENCES users (id) ON DELETE CASCADE,
   user_config_id             UUID        NOT NULL REFERENCES user_configs (id) ON DELETE RESTRICT,
-  nearest_monitoring_well_id UUID        NOT NULL REFERENCES monitoring_wells (id) ON DELETE RESTRICT,
+  nearest_monitoring_well_id UUID                 REFERENCES monitoring_wells (id) ON DELETE RESTRICT,
 
-  -- User input
-  input_lat                  NUMERIC     NOT NULL,
-  input_lon                  NUMERIC     NOT NULL,
+  -- User input (lat/lon nullable — caller may supply precomputed depth instead)
+  input_lat                  NUMERIC,
+  input_lon                  NUMERIC,
   water_demand_gpm           NUMERIC     NOT NULL,
 
   -- Calculated results
   estimated_depth            NUMERIC     NOT NULL,
-  altitude_difference        NUMERIC     NOT NULL,
-  depth_to_water             NUMERIC     NOT NULL,
+  altitude_difference        NUMERIC,                         -- null when depth was supplied directly
+  depth_to_water             NUMERIC,                         -- null when depth was supplied directly
   casing_diameter            NUMERIC     NOT NULL, -- inches
   screen_length              NUMERIC     NOT NULL, -- feet
   slot_size                  NUMERIC     NOT NULL,
@@ -286,5 +290,5 @@ CREATE TABLE IF NOT EXISTS estimates
   created_at                 TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Speed up "show me all estimates for this user" queries.
-CREATE INDEX idx_estimates_user_id ON estimates (user_id);
+-- Speed up "show me all well designs for this user" queries.
+CREATE INDEX idx_well_designs_user_id ON well_designs (user_id);

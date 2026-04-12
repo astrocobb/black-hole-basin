@@ -1,4 +1,5 @@
-import { estimatesSection } from './estimates-section'
+import { wellDesignsSection } from './well-designs-section'
+import { depthCalculatorSection } from './depth-calculator-section'
 import { configsSection } from './configs-section'
 import type { DashboardSection } from './types'
 
@@ -8,7 +9,8 @@ import type { DashboardSection } from './types'
  * in the dashboard tab bar — each entry must satisfy {@link DashboardSection}.
  */
 export const dashboardSections: ReadonlyArray<DashboardSection<any>> = [
-  estimatesSection,
+  wellDesignsSection,
+  depthCalculatorSection,
   configsSection
 ]
 

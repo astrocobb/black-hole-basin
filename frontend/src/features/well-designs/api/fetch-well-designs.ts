@@ -1,16 +1,16 @@
 import { apiClient } from '../../../lib/api-client'
 
-export interface Estimate {
+export interface WellDesign {
   id: string
   userId: string
   userConfigId: string
-  nearestMonitoringWellId: string
-  inputLat: number
-  inputLon: number
+  nearestMonitoringWellId: string | null
+  inputLat: number | null
+  inputLon: number | null
   waterDemandGpm: number
   estimatedDepth: number
-  altitudeDifference: number
-  depthToWater: number
+  altitudeDifference: number | null
+  depthToWater: number | null
   casingDiameter: number
   screenLength: number
   slotSize: number
@@ -23,13 +23,13 @@ export interface Estimate {
   createdAt: string
 }
 
-interface EstimatesResponse {
+interface WellDesignsResponse {
   status: number
-  data: Estimate[]
+  data: WellDesign[]
   message: string
 }
 
-export async function fetchEstimates(): Promise<EstimatesResponse> {
-  const res = await apiClient(`/api/estimates`)
+export async function fetchWellDesigns(): Promise<WellDesignsResponse> {
+  const res = await apiClient('/api/well-designs')
   return res.json()
 }

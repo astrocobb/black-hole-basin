@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - [ ] Add OSE well logs to database
 - [ ] Implement OSE well logs into estimates or calculator
 - [ ] Add the nearest OSE wells info and monitoring well info to each estimate
-- [ ] Add a delete estimate button
+- [ ] Add a delete well design button
 - [ ] Estimate history page with filters (date, location, cost range) and CSV export
 - [ ] Map view showing estimates + nearest monitoring wells
 - [ ] Side-by-side comparison of multiple estimates
@@ -116,46 +116,31 @@ React 19 conventions live in the `react-19` skill (`.claude/skills/react-19/SKIL
 - Throws format: `@throws { ErrorClass } When condition`
 - Route comments: `/** METHOD /path - Description */` — HTTP verb in all caps, with `@` prefix
 
-## Estimates Feature
+## Depth Calculator + Well Designs
 
-`POST /api/estimates` — single endpoint that returns a full well drilling estimate.
+The old `estimates` feature was split into two features:
 
-**Input**: lat/lon location, water demand (GPM), client config ID
+### `depth-calculator` (ephemeral)
 
-**Pipeline** (orchestrated by `estimates.service.ts`):
-1. Find nearest monitoring well to input location (PostGIS spatial query)
-2. Get that well's `wellDepth` and `altitude`
-3. Look up recent `depthToWater` from `well_data` for that well
-4. Compare altitudes between input location and monitoring well → estimated depth
-5. Calculate casing diameter from water demand (standard GPM-to-diameter rules)
-6. Calculate screen length from water demand and estimated depth
-7. Pull client config for pricing rates
-8. Calculate cost from depth × cost-per-foot, casing cost, screen cost, etc.
+Pure compute — no persistence. Given `(inputLat, inputLon)`, finds the nearest monitoring well, pulls its latest `depthToWater`, compares altitudes, and returns an `estimatedDepth` (with a 200 ft safety buffer). Used both as a standalone tool and internally by `well-designs`.
 
-**Output**: estimated depth, casing diameter, screen length, depth to water, altitude difference, cost breakdown, nearest monitoring well reference
+- `POST /api/depth-calculator` — `{ inputLat, inputLon }` → `{ nearestMonitoringWellId, estimatedDepth, altitudeDifference, depthToWater, inputAltitude }`
+- Repository: `selectNearestMonitoringWell(lat, lon)` (PostGIS), `selectLatestWellData(wellId)` — read-only.
+
+### `well-designs` (persisted)
+
+Turns a depth + water demand + config into casing/screen specs and a cost breakdown, then persists to the `well_designs` table. Accepts **either** a precomputed `estimatedDepth` **or** `(inputLat, inputLon)`; when coords are given, the service calls `calculateDepthService()` internally. When a depth is supplied directly, `nearestMonitoringWellId`, `altitudeDifference`, and `depthToWater` are stored as `NULL`.
 
 **Endpoints**:
-- `POST /api/estimates` — run the pipeline, persist the result, return 201 with the full estimate
-- `GET /api/estimates/:id` — retrieve a saved estimate by ID (ownership check)
-- `GET /api/estimates` — list all estimates for the session user (ordered by `created_at DESC`)
-- `DELETE /api/estimates/:id` — remove a saved estimate (ownership check)
+- `POST /api/well-designs` — run the pipeline, persist, return 201. Validated by `WellDesignInputSchema.superRefine(...)` which requires exactly one of `(inputLat+inputLon)` or `estimatedDepth`.
+- `GET /api/well-designs/:id` — retrieve by ID (ownership check).
+- `GET /api/well-designs` — list for the session user (`created_at DESC`).
+- `DELETE /api/well-designs/:id` — remove (ownership check).
 
-**POST service flow**:
-1. Validate ownership / attach `sessionUserId`
-2. Spatial query: find nearest monitoring well to `(lat, lon)` via PostGIS `ST_Distance` → get `wellDepth`, `altitude`
-3. Query `well_data` for that well: most recent `depthToWater` (`ORDER BY date_measured DESC LIMIT 1`)
-4. Get altitude at input location (external API or lookup) → compute `altitudeDifference` and `estimatedDepth`
-5. Derive `casingDiameter` from `waterDemandGpm` (standard GPM-to-diameter rules)
-6. Derive `screenLength` from `waterDemandGpm` and `estimatedDepth`
-7. Fetch user config (`selectUserConfigById`) for pricing rates
-8. Compute costs: drilling (depth × cost-per-foot), casing, screen, gravel pack, mobilization → `totalCost`
-9. Generate estimate ID, build full estimate object, `insertEstimate`, return result
+**Key calculation helpers** (pure, in `well-designs.service.ts`): `calculateCasingDiameter(waterDemandGpm)` — GPM lookup; `calculateScreenLength(waterDemandGpm, estimatedDepth)`; cost math inline. Pricing rates come from `selectUserConfigById()` in `user-configs`.
 
-**Key functions for POST**:
-- *Repository (new)*: `selectNearestMonitoringWell(lat, lon)` — PostGIS spatial query returning closest well (`id`, `wellDepth`, `altitude`); `selectLatestWellData(monitoringWellId)` — most recent `depthToWater` for a well; `insertEstimate(estimate)` — persist the full estimate
-- *Repository (existing)*: `selectUserConfigById(id)` — pulls pricing rates from user configs
-- *Calculation helpers* (pure functions in service or lib): `calculateCasingDiameter(waterDemandGpm)` — GPM-to-diameter lookup; `calculateScreenLength(waterDemandGpm, estimatedDepth)` — screen sizing; `calculateCosts(estimatedDepth, casingDiameter, screenLength, userConfig)` — returns cost breakdown
-
-**Features**:
-- `estimates/` — route, controller, service, schema; repository for spatial queries
-- `client-configs/` — CRUD for pricing/config (cost per foot, casing prices, screen prices, mobilization fee)
+**Frontend**:
+- `/depth-calculator` — standalone page.
+- `/well-designs/new` — form. Reads `?estimatedDepth=` to pre-fill from the calculator; otherwise shows lat/lon inputs.
+- `/well-designs/:id` — detail view; renders `—` for the nullable calc-derived fields.
+- `/dashboard` — three sectioned tabs (Well Designs, Depth Calculator, Configs) via the `features/dashboard/sections/` registry. New sections drop a file and append to the `dashboardSections` array.
